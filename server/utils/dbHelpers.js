@@ -19,8 +19,9 @@ export async function backupFuuBotDb(fuuClient){
     try{
         await fuuClient.backup('backup.db');
         console.log('Successfully backed up FuuBot DB');
+
     } catch (error) {
-        console.error("Error backing up FuuBot DB", error);
+        console.error("Error backing up or vacuuming FuuBot DB", error);
     }
 }
 
@@ -49,4 +50,15 @@ export function loadFromBackup(memClient){
 
 export function getMemoryClient(){
     return new Database(':memory:');
+}
+
+export function vacuumBackup(){
+    const backupClient = new Database('backup.db');
+    try{
+        backupClient.exec('VACUUM;');
+        console.log('Successfully vacuumed FuuBot DB');
+    } catch (error) {
+        console.error("Error vacuuming FuuBot DB", error);
+    }
+    backupClient.close();
 }
