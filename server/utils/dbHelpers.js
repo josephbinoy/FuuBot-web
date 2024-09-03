@@ -1,4 +1,5 @@
 import Database from "better-sqlite3"
+import logger from "./Logger.js"
 
 export function getFuuBotClient(){
     let fuubotDbClient;
@@ -7,10 +8,10 @@ export function getFuuBotClient(){
             readonly: true,
             fileMustExist: true
         })
-        console.log('Successfully connected to FuuBot DB');
+        logger.info('Successfully connected to FuuBot DB');
         
     } catch (error) {
-        console.error("Error connecting to FuuBot DB", error)
+        logger.error("Error connecting to FuuBot DB", error)
     }
     return fuubotDbClient;
 }
@@ -18,10 +19,10 @@ export function getFuuBotClient(){
 export async function backupFuuBotDb(fuuClient){
     try{
         await fuuClient.backup('backup.db');
-        console.log('Successfully backed up FuuBot DB');
+        logger.info('Successfully backed up FuuBot DB');
 
     } catch (error) {
-        console.error("Error backing up or vacuuming FuuBot DB", error);
+        logger.error("Error backing up or vacuuming FuuBot DB", error);
     }
 }
 
@@ -36,15 +37,13 @@ export function loadFromBackup(memClient){
             );
             CREATE INDEX IF NOT EXISTS idx_beatmap_id ON PICKS (BEATMAP_ID);
             CREATE INDEX IF NOT EXISTS idx_pick_date ON PICKS (PICK_DATE);
-            ATTACH DATABASE 'backup.db' AS fuudb;
-            BEGIN;
-            INSERT INTO main.PICKS SELECT * FROM fuudb.PICKS;
-            COMMIT;
-            DETACH DATABASE fuudb;
+            ATTACH DATABASE 'backup.db' AS back;
+            INSERT INTO main.PICKS SELECT * FROM back.PICKS;
+            DETACH DATABASE back;
         `);
-        console.log('Successfully loaded FuuBot DB to memory');
+        logger.info('Successfully loaded FuuBot DB to memory');
     } catch (error) {
-        console.error("Error loading FuuBot DB to memory", error);
+        logger.error("Error loading FuuBot DB to memory", error);
     }
 }
 
@@ -56,9 +55,37 @@ export function vacuumBackup(){
     const backupClient = new Database('backup.db');
     try{
         backupClient.exec('VACUUM;');
-        console.log('Successfully vacuumed FuuBot DB');
+        logger.info('Successfully vacuumed backup DB');
     } catch (error) {
-        console.error("Error vacuuming FuuBot DB", error);
+        logger.error("Error vacuuming backup DB", error);
     }
     backupClient.close();
+}
+
+export async function getNewRows(fuuClient, lastUpdateTimestamp){
+    try{
+        const newRows = fuuClient.prepare(`
+            SELECT * FROM PICKS
+            WHERE PICK_DATE > ${lastUpdateTimestamp};
+        `).all();
+        logger.info(`Found ${newRows.length} new rows in FuuBot DB`);
+        return newRows;
+    } catch (error) {
+        logger.error("Error fetchng new rows from FuuBot DB", error);
+    }
+}
+
+export async function updateMemoryDb(memClient, newRows){
+    try{
+        const insert = memClient.prepare(`
+            INSERT INTO PICKS (BEATMAP_ID, PICKER_ID, PICK_DATE)
+            VALUES (@BEATMAP_ID, @PICKER_ID, @PICK_DATE);
+        `);
+        for (const row of newRows) {
+            insert.run(row);
+        }
+        logger.info('Successfully updated memory DB');
+    } catch (error) {
+        logger.error("Error updating memory DB", error);
+    }
 }
