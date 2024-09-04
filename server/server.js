@@ -42,7 +42,6 @@ async function main(){
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
-                console.log('Returning cached weekly result page', pageNo);
                 res.json(JSON.parse(cachedResult));      
                 return;
             }
@@ -65,12 +64,10 @@ async function main(){
                 }
             }
 
-            if (result.length === 0) {
-                console.log('No data found for page', pageNo);    
+            if (result.length === 0) { 
                 res.status(404).json({ error: 'No data found' });          
             }
             else{
-                console.log('Returning fresh weekly result page', pageNo);
                 await redisCache.set(cacheKey, JSON.stringify({ dbv: lastUpdateTimestamp, data: result }));
                 res.json({ dbv: lastUpdateTimestamp, data: result });
             }
@@ -91,7 +88,6 @@ async function main(){
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
-                console.log('Returning cached monthly result page', pageNo);
                 res.json(JSON.parse(cachedResult));
                 return;
             }
@@ -114,12 +110,10 @@ async function main(){
                 }
             }       
 
-            if (result.length === 0) {
-                console.log('No data found for page', pageNo);    
+            if (result.length === 0) {  
                 res.status(404).json({ error: 'No data found' });        
             }
             else{
-                console.log('Returning fresh monthly result page', pageNo);
                 await redisCache.set(cacheKey, JSON.stringify({ dbv: lastUpdateTimestamp, data: result }));
                 res.json({ dbv: lastUpdateTimestamp, data: result });
             }
@@ -140,7 +134,6 @@ async function main(){
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
-                console.log('Returning cached yearly result page', pageNo);
                 res.json(JSON.parse(cachedResult));
                 return;
             }
@@ -163,12 +156,10 @@ async function main(){
                 }
             } 
 
-            if (result.length === 0) {
-                console.log('No data found for page', pageNo);    
+            if (result.length === 0) {   
                 res.status(404).json({ error: 'No data found' });         
             }
             else{
-                console.log('Returning fresh yearly result page', pageNo);
                 await redisCache.set(cacheKey, JSON.stringify({ dbv: lastUpdateTimestamp, data: result }));
                 res.json({ dbv: lastUpdateTimestamp, data: result });
             }
@@ -189,7 +180,6 @@ async function main(){
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
-                console.log('Returning cached alltime result page', pageNo);
                 res.json(JSON.parse(cachedResult));
                 return;
             }
@@ -211,12 +201,10 @@ async function main(){
                 }
             }       
 
-            if (result.length === 0) {
-                console.log('No data found for page', pageNo);    
+            if (result.length === 0) {  
                 res.status(404).json({ error: 'No data found' });         
             }
             else{
-                console.log('Returning fresh alltime result page', pageNo);
                 await redisCache.set(cacheKey, JSON.stringify({ dbv: lastUpdateTimestamp, data: result }));
                 res.json({ dbv: lastUpdateTimestamp, data: result });
             }

@@ -20,9 +20,7 @@ export default function MapTable( { tableType }) {
                 });
                 const newRows = response.data.data;
                 setDbv(response.data.dbv);
-                console.log(`Fetched ${tableType} rows:`, newRows);
                 setRows(prevRows => {
-                    // Filter out null values and append new rows
                     const filteredRows = prevRows.filter(row => row !== null);
                     return [...filteredRows, ...newRows];
                 });
