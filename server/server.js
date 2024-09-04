@@ -1,13 +1,11 @@
 import express from "express";
 import 'dotenv/config'
-import cors from "cors";
 import { getFuuBotClient, getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, getNewRows, updateMemoryDb } from "./utils/dbHelpers.js";
 import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedisFromFuuBot } from "./utils/redisHelpers.js";
 import logger from "./utils/Logger.js";
 import { addCleanupListener } from "async-cleanup";
 
 const app = express();
-app.use(cors());
 const fuuClient = getFuuBotClient();
 const memClient = getMemoryClient();
 const redisMeta = await getRedisMetaClient();
@@ -33,7 +31,7 @@ async function main(){
     loadFromBackup(memClient);
     memClient.pragma('journal_mode = WAL');
 
-    app.get('/weekly', async (req, res) => {
+    app.get('/api/weekly', async (req, res) => {
         const pageNo = parseInt(req.query.pageNo) || 0;
         const dbv = parseInt(req.query.dbv) || -1;
         if (dbv !=-1 && dbv != lastUpdateTimestamp) {
@@ -82,7 +80,7 @@ async function main(){
         }
     });
 
-    app.get('/monthly', async (req, res) => {
+    app.get('/api/monthly', async (req, res) => {
         const pageNo = parseInt(req.query.pageNo) || 0;
         const dbv = parseInt(req.query.dbv) || -1;
         if (dbv !=-1 && dbv != lastUpdateTimestamp) {
@@ -131,7 +129,7 @@ async function main(){
         }
     });
 
-    app.get('/yearly', async (req, res) => {
+    app.get('/api/yearly', async (req, res) => {
         const pageNo = parseInt(req.query.pageNo) || 0;
         const dbv = parseInt(req.query.dbv) || -1;
         if (dbv !=-1 && dbv != lastUpdateTimestamp) {
@@ -180,7 +178,7 @@ async function main(){
         }
     });
 
-    app.get('/alltime', async (req, res) => {
+    app.get('/api/alltime', async (req, res) => {
         const pageNo = parseInt(req.query.pageNo) || 0;
         const dbv = parseInt(req.query.dbv) || -1;
         if (dbv !=-1 && dbv != lastUpdateTimestamp) {
