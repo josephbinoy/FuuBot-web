@@ -58,7 +58,7 @@ async function main(){
         
             const result = [];
             for (const row of rows) {
-                const meta = await redisMeta.hGetAll(`${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`osubeatmap:${row.BEATMAP_ID}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }
@@ -104,7 +104,7 @@ async function main(){
         
             const result = [];
             for (const row of rows) {
-                const meta = await redisMeta.hGetAll(`${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`osubeatmap:${row.BEATMAP_ID}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }
@@ -150,7 +150,7 @@ async function main(){
         
             const result = [];
             for (const row of rows) {
-                const meta = await redisMeta.hGetAll(`${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`osubeatmap:${row.BEATMAP_ID}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }
@@ -195,7 +195,7 @@ async function main(){
         
             const result = [];
             for (const row of rows) {
-                const meta = await redisMeta.hGetAll(`${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`osubeatmap:${row.BEATMAP_ID}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }

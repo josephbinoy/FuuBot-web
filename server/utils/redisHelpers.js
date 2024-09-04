@@ -109,7 +109,7 @@ export async function hydrateRedisFromFuuBot(redisClient, rows){
         const row = rows[i];
         const beatmapId = Number(row.BEATMAP_ID);
         try {
-            if (!(await redisClient.exists(`${beatmapId}`))) {
+            if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId, bearerToken));
                 await redisClient.hSet(`osubeatmap:${beatmapId}`, {
                     t: t,
@@ -149,9 +149,9 @@ export async function hydrateRedisFromBackup(redisClient){
         const row = rows[i];
         const beatmapId = Number(row.BEATMAP_ID);
         try {
-            if (!(await redisClient.exists(`${beatmapId}`))) {
+            if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId, bearerToken));
-                await redisClient.hSet(`${beatmapId}`, {
+                await redisClient.hSet(`osubeatmap:${beatmapId}`, {
                     t: t,
                     a: a,
                     m: m
