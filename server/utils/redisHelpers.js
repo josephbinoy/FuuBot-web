@@ -172,7 +172,7 @@ export async function deleteCache(redisClient) {
     try {
         const cacheKeys = await redisClient.keys(`fuubot:*`);
         if (cacheKeys.length > 0) {
-            await redisCache.del(cacheKeys);
+            await redisClient.del(cacheKeys);
         }
     } catch (error) {
         logger.error('Error deleting cache:', error);
