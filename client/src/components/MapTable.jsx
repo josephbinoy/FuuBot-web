@@ -15,7 +15,7 @@ export default function MapTable( { tableType }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`$/api/${tableType}`, {
+                const response = await axios.get(`/api/${tableType}`, {
                     params: { pageNo, dbv: dbv }
                 });
                 const newRows = response.data.data;
