@@ -150,7 +150,7 @@ export async function hydrateRedisFromBackup(redisClient){
         const beatmapId = Number(row.BEATMAP_ID);
         try {
             if (!(await redisClient.exists(`${beatmapId}`))) {
-                ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId));
+                ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId, bearerToken));
                 await redisClient.hSet(`${beatmapId}`, {
                     t: t,
                     a: a,
