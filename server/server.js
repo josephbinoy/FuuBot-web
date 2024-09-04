@@ -1,7 +1,7 @@
 import express from "express";
 import 'dotenv/config'
 import { getFuuBotClient, getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, getNewRows, updateMemoryDb } from "./utils/dbHelpers.js";
-import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedisFromFuuBot } from "./utils/redisHelpers.js";
+import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedisFromFuuBot, deleteCache } from "./utils/redisHelpers.js";
 import logger from "./utils/Logger.js";
 import { addCleanupListener } from "async-cleanup";
 
@@ -16,7 +16,7 @@ async function updateAndHydrate() {
     const newRows = await getNewRows(fuuClient, lastUpdateTimestamp);
     updateMemoryDb(memClient, newRows);
     lastUpdateTimestamp = Math.floor(new Date().getTime() / 1000);
-    await redisCache.flushDb();
+    await deleteCache(redisCache);
     hydrateRedisFromFuuBot(redisMeta, newRows);
 }
 
@@ -25,8 +25,8 @@ async function main(){
     lastUpdateTimestamp = Math.floor(new Date().getTime() / 1000);
     setInterval(updateAndHydrate, 3600000);
     vacuumBackup();
-    await redisCache.flushDb();
-    logger.info('Flushed Redis cache');
+    await deleteCache(redisCache);
+    logger.info('Deleted redis cache');
     await hydrateRedisFromBackup(redisMeta);
     loadFromBackup(memClient);
     memClient.pragma('journal_mode = WAL');
@@ -38,7 +38,7 @@ async function main(){
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
-        const cacheKey = `weekly-${pageNo}`;    
+        const cacheKey = `fuubot:weekly-${pageNo}`;    
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
@@ -84,7 +84,7 @@ async function main(){
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
-        const cacheKey = `monthly-${pageNo}`;    
+        const cacheKey = `fuubot:monthly-${pageNo}`;    
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
@@ -130,7 +130,7 @@ async function main(){
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
-        const cacheKey = `yearly-${pageNo}`;    
+        const cacheKey = `fuubot:yearly-${pageNo}`;    
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {
@@ -176,7 +176,7 @@ async function main(){
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
-        const cacheKey = `alltime-${pageNo}`;    
+        const cacheKey = `fuubot:alltime-${pageNo}`;    
         try {
             const cachedResult = await redisCache.get(cacheKey);
             if (cachedResult) {

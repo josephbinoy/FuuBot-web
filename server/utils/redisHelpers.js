@@ -51,10 +51,10 @@ async function getGuestToken() {
             logger.info('Fetched guest token.');
             return response.data.access_token;
         } else {
-            logger.error(`Error: Received status code ${response.status}`);
+            logger.error(`Error: couldn't get guest token. Received status code ${response.status}`);
         }
     } catch (error) {
-        logger.error(`Error: ${error.message}`);
+        logger.error(`Error couldn't get guest token: ${error.message}`);
     }
 }
 
@@ -111,7 +111,7 @@ export async function hydrateRedisFromFuuBot(redisClient, rows){
         try {
             if (!(await redisClient.exists(`${beatmapId}`))) {
                 ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId, bearerToken));
-                await redisClient.hSet(`${beatmapId}`, {
+                await redisClient.hSet(`osubeatmap:${beatmapId}`, {
                     t: t,
                     a: a,
                     m: m
@@ -166,4 +166,15 @@ export async function hydrateRedisFromBackup(redisClient){
     }
     logger.info('Hydration complete');
     db.close();
+}
+
+export async function deleteCache(redisClient) {
+    try {
+        const cacheKeys = await redisClient.keys(`fuubot:*`);
+        if (cacheKeys.length > 0) {
+            await redisCache.del(cacheKeys);
+        }
+    } catch (error) {
+        logger.error('Error deleting cache:', error);
+    }
 }

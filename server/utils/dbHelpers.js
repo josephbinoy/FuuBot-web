@@ -18,7 +18,7 @@ export function getFuuBotClient(){
 
 export async function backupFuuBotDb(fuuClient){
     try{
-        await fuuClient.backup('backup.db');
+        await fuuClient.backup(process.env.BACKUP_DB_PATH);
         logger.info('Successfully backed up FuuBot DB');
 
     } catch (error) {
