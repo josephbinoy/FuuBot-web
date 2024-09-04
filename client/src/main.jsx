@@ -1,9 +1,10 @@
-import React, { act } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
+import { DbvProvider } from "./context/DbvProvider";
 
 const theme = {
   navbar: {
@@ -22,10 +23,32 @@ const theme = {
     styles: {
       colors: {
         "blue-gray": {
-          gradient: "opacity-60 bg-gradient-to-tr from-glow-300 via-glow-200 to-glow-300 hover:text-shadow-yellow-glow",
+          gradient: "bg-gradient-to-tr from-glow-300 via-glow-200 to-glow-300",
         },
       },
     },
+  },
+  alert: {
+    styles: {
+      base: {
+        alert: {
+          width: "w-fit",
+          fontFamily: "font-visby",
+          fontWeight: "font-bold",
+          px: "px-4",
+          py: "py-4",
+          borderRadius: "rounded-lg",
+        },
+      },
+      variants: {
+        filled: {
+          "blue-gray": {
+            background: "bg-osuslate-200",
+            color: "text-white",
+          },
+        }
+      }
+    }
   },
   button: {
     styles: {
@@ -41,6 +64,7 @@ const theme = {
       variants: {
         filled: {
           "blue-gray": {
+            text: "text-xl",
             background: "bg-osuslate-500",
             color: "text-osuslate-100",
             shadow: "",
@@ -48,18 +72,13 @@ const theme = {
               color: "hover:text-osuslate-50",
             },
             active: {
-              color: "active:text-osuslate-50",
+              color: "",
             },
             focus: {
-              color: "focus:text-white focus:-translate-y-px",
+              color: "focus:text-white outline-none ",
             },
           },
         },
-        text: {
-          "blue-gray": {
-            color: "text-blue-gray-500",
-          },
-        }
       },
     },
   },
@@ -74,9 +93,9 @@ const theme = {
   },
 };
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <ThemeProvider value={theme}>
-      <App />
+      <DbvProvider>
+        <App />
+      </DbvProvider>
     </ThemeProvider>
-  </React.StrictMode>
 );

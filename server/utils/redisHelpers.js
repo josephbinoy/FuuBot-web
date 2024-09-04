@@ -3,15 +3,38 @@ import Database from 'better-sqlite3';
 import axios from 'axios';
 import logger from './Logger.js';
 
-export async function getRedisClient(){
+export async function getRedisCacheClient() {
     const client = createClient({
-        url: process.env.REDIS_SERVER_URL
+        url: process.env.REDIS_CACHE_URL
     });
     client.on('error', async err => {
-        throw new Error('Redis Client Error', err);
+        logger.error('Redis Cache Client Error:', err);
+        throw new Error('Redis Cache Client Error', err);
     });
     await client.connect();
-    return client;
+    if (client.isReady) {
+        logger.info('Redis Cache Client connected successfully');
+        return client;
+    } else {
+        logger.error('Redis Cache Client failed to connect');
+    }
+}
+
+export async function getRedisMetaClient() {
+    const client = createClient({
+        url: process.env.REDIS_META_URL
+    });
+    client.on('error', async err => {
+        logger.error('Redis Metadata Client Error:', err);
+        throw new Error('Redis Metadata Client Error', err);
+    });
+    await client.connect();
+    if (client.isReady) {
+        logger.info('Redis Metadata Client connected successfully');
+        return client;
+    } else {
+        logger.error('Redis Meta Client failed to connect');
+    }
 }
 
 
@@ -35,7 +58,7 @@ async function getGuestToken() {
     }
 }
 
-export async function fetchBeatmapsetMetadata(beatmapsetId) {
+export async function fetchBeatmapsetMetadata(beatmapsetId, bearerToken) {
     try {
       const url = 'https://osu.ppy.sh/api/v2/beatmapsets/' + beatmapsetId;
   
@@ -80,14 +103,14 @@ function updateProgressBar(current, total) {
 export async function hydrateRedisFromFuuBot(redisClient, rows){
     const bearerToken = await getGuestToken();
     if (!bearerToken) return;
-    logger.info('Hydrating Redis with beatmap metadata...\n');
+    logger.info('Hydrating Redis with beatmap metadata...');
     let a, t, m;
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const beatmapId = Number(row.BEATMAP_ID);
         try {
             if (!(await redisClient.exists(`${beatmapId}`))) {
-                ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId));
+                ({ a, t, m } = await fetchBeatmapsetMetadata(beatmapId, bearerToken));
                 await redisClient.hSet(`${beatmapId}`, {
                     t: t,
                     a: a,

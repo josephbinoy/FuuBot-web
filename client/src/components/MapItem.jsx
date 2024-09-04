@@ -1,14 +1,29 @@
-export default function MapItem({mapName, imageUrl, mapCount, status}){
-    const borderColorClass = status === 'red' ? 'border-red-500' : status === 'orange' ? 'border-orange-500' : 'border-green-500';
+export default function MapItem({mapId, mapName, mapArtist, mapper, imageUrl, mapCount=0, tabletype}) {
+    let limit = 1000;
+    switch(tabletype){
+        case 'weekly': limit = import.meta.env.VITE_WEEKLY_LIMIT; break;
+        case 'monthly': limit = import.meta.env.VITE_MONTHLY_LIMIT; break;
+        case 'yearly': limit = import.meta.env.VITE_YEARLY_LIMIT; break;
+        case 'alltime': limit = import.meta.env.VITE_ALLTIME_LIMIT; break;
+        default: limit = 1000; break;
+    }
+    const borderColorClass = mapCount > limit ? 'border-red-500' : mapCount > limit * 0.75 ? 'border-orange-500' : 'border-green-500';    
     return (
-<div
-  className={`flex items-center justify-between bg-cover bg-center mx-auto max-w-screen-xl w-full h-20 rounded-lg my-2 px-6 font-visby font-bold text-2xl text-opacity-80 text-white border-r-4 ${borderColorClass}`}
-  style={{
-        backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.7) 100%), url(${imageUrl})`
-      }}
-    >
-      <h2>{mapName.length>40?mapName.substring(0,40)+"...":mapName}</h2>
-      <p>{mapCount}</p>
-</div>
+      <a href={`https://osu.ppy.sh/beatmapsets/${mapId}`} className="mx-auto max-w-screen-xl w-11/12 my-2">
+        <div
+          className={`flex items-center justify-between bg-cover bg-center h-20 rounded-lg px-6 font-visby font-bold text-2xl text-opacity-80 text-white border-r-4 ${borderColorClass}`}
+          style={{
+                backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.7) 100%), url(${imageUrl})`
+              }}
+            >
+            <div className="w-6/12 flex flex-col gap-1">
+              <h2 className="truncate w-full">{mapName}</h2>
+              <div className="text-xs flex items-center w-full">
+                <p className="truncate">{mapArtist} •<span className="text-gray-500"> Mapped by {mapper}</span></p>
+              </div>
+            </div>
+            <p>{mapCount}</p>
+        </div>
+      </a>
     )
 }

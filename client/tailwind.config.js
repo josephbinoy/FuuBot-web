@@ -25,21 +25,8 @@ export default withMT({
         }
       },
       fontFamily: {
-        visby: ['VisbyRoundCF', 'sans-serif'],
-      },
-      textShadow: {
-        'yellow-glow': '0 0 0.5px rgba(241, 241, 202, 0.5), 0 0 0.5px rgba(241, 241, 202, 0.5), 0 0 0.5px rgba(241, 241, 202, 0.5)',
+        visby: ['VisbyRoundCF','Helvetica','sans-serif'],
       },
     },
   },
-  plugins: [
-    function ({ addUtilities }) {
-      addUtilities({
-        '.text-shadow-yellow-glow': {
-          'text-shadow': '0 0 0.5px rgba(241, 241, 202, 0.5), 0 0 0.5px rgba(241, 241, 202, 0.5), 0 0 0.5px rgba(241, 241, 202, 0.5)',
-        },
-      });
-    },
-      require('tailwind-scrollbar'),
-  ]
-});
+  plugins: [require('tailwind-scrollbar')]});
