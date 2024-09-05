@@ -77,9 +77,16 @@ async function main(){
 
     app.get('/api/:period', async (req, res) => {
         const { period } = req.params;
-        const pageNo = parseInt(req.query.pageNo) || 0;
-        const dbv = parseInt(req.query.dbv) || -1;
-        if (dbv !=-1 && dbv != lastUpdateTimestamp) {
+        let pageNo = parseInt(req.query.pageNo) || 0;
+        const dbv = parseInt(req.query.dbv);
+        if (isNaN(dbv) || pageNo < 0) {
+            res.status(400).json({ error: 'Invalid parameters' });
+            return;
+        }
+        else if (dbv === -1) {
+            pageNo = 0;
+        }
+        else if (dbv != lastUpdateTimestamp) {
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
@@ -87,7 +94,7 @@ async function main(){
         try {
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
-                if (cachedResult) {
+                if (cachedResult) {                  
                     res.json(JSON.parse(cachedResult));
                     return;
                 }
@@ -106,7 +113,7 @@ async function main(){
             }
             if (!isDeletingCache) {
                 await redisCache.set(cacheKey, JSON.stringify(result));
-            }
+            }        
             res.json(result);
         } catch (error) {
             logger.error('Error fetching data:', error);
