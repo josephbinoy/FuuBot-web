@@ -11,15 +11,22 @@ export default function MapTable( { tableType }) {
     const [open, setOpen] = useState(false);
     const [dataEnd, setDataEnd] = useState(false);
     const observer = useRef();
-    const { dbv, setDbv } = useDbv();
+    const { dbv } = useDbv();
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(`/api/${tableType}`, {
                     params: { pageNo, dbv: dbv }
                 });
-                const newRows = response.data.data;
-                setDbv(response.data.dbv);
+                const newRows = response.data;
+                if (newRows.length === 0) {
+                    if (observer.current) {
+                        observer.current.disconnect();
+                    }
+                    setRows(prevRows => prevRows.filter(row => row !== null));
+                    setDataEnd(true);
+                    return;
+                }
                 setRows(prevRows => {
                     const filteredRows = prevRows.filter(row => row !== null);
                     return [...filteredRows, ...newRows];
@@ -30,11 +37,7 @@ export default function MapTable( { tableType }) {
                 }
                 setRows(prevRows => prevRows.filter(row => row !== null));
                 console.log('Error fetching data:', error);
-                if(error.response.data.error==='No data found'){
-                    setDataEnd(true);
-                }
-                else if(error.response.data.error==='dbv mismatch'){
-                    console.log('Database updated, user must refresh');
+                if(error.response.data.error==='dbv mismatch'){
                     setOpen(true);
                 }
             }

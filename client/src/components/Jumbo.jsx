@@ -1,5 +1,7 @@
 import { ButtonGroup, Button } from "@material-tailwind/react";
 import { useDbv } from "../context/DbvProvider.jsx";
+import axios from 'axios';
+import { useEffect, useState } from "react";
 
 export function timeAgo(timestamp) {
     const dateString = new Date(timestamp * 1000).toISOString();
@@ -29,11 +31,28 @@ export function timeAgo(timestamp) {
     }
 }
 export default function Jumbo({tab, currentTable, setcurrentTable}) {
-    const { dbv } = useDbv();
+    const { dbv, setDbv } = useDbv();
+    const [lastUpdate, setLastUpdate] = useState(0);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3000/api/stats`);
+                setDbv(response.data.dbv);
+                const updateLastUpdate = () => {
+                    setLastUpdate(timeAgo(response.data.dbv));
+                };
+                updateLastUpdate();
+                setInterval(updateLastUpdate, 60000);
+            } catch (error) {
+                console.log('Error fetching stats:', error);
+            }
+        };
+        fetchData();
+    }, []);
     return (
         <div className="mx-auto max-w-screen-xl flex items-center justify-between h-40">
             <h1 className="text-4xl text-osuslate-50 font-black px-10">Popular {tab}</h1>
-            <p className="absolute  bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80">{dbv!=-1 && `Last updated ${timeAgo(dbv)}`}</p>
+            <p className="absolute  bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80">{dbv!=-1 && `Last updated ${lastUpdate}`}</p>
             <ButtonGroup fullWidth ripple={false} size="lg" color="blue-gray">
                 <Button onClick={() => setcurrentTable('weekly')}>
                     <p className={`${currentTable === 'weekly' && 'text-white -translate-y-px'}`}>weekly</p>

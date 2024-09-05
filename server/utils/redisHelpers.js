@@ -116,7 +116,7 @@ export async function hydrateRedisFromFuuBot(redisClient, rows){
                     a: a,
                     m: m
                 });
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 70));
             }
         } catch (error) {
             logger.info(`Error: ${error.message}`);
@@ -156,7 +156,7 @@ export async function hydrateRedisFromBackup(redisClient){
                     a: a,
                     m: m
                 });
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 70));
             }
         } catch (error) {
             logger.info(`Error: ${error.message}`);
@@ -170,10 +170,16 @@ export async function hydrateRedisFromBackup(redisClient){
 
 export async function deleteCache(redisClient) {
     try {
-        const cacheKeys = await redisClient.keys(`fuubot:*`);
-        if (cacheKeys.length > 0) {
-            await redisClient.del(cacheKeys);
+        const keysToDelete = [];
+        for await (const key of redisClient.scanIterator({MATCH: 'fuubot:*', COUNT: 50})) {
+            keysToDelete.push(key);
         }
+        if (keysToDelete.length === 0) {
+            logger.info('Cache already empty');
+            return;
+        }
+        await redisClient.del(keysToDelete);
+        logger.info('Successfully deleted cache');
     } catch (error) {
         logger.error('Error deleting cache:', error);
     }
