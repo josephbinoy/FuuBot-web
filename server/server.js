@@ -77,14 +77,15 @@ async function main(){
 
     app.get('/api/:period', async (req, res) => {
         const { period } = req.params;
-        let pageNo = parseInt(req.query.pageNo) || 0;
+        let pageNo = parseInt(req.query.pageNo);
         const dbv = parseInt(req.query.dbv);
-        if (isNaN(dbv) || pageNo < 0) {
+        if (isNaN(dbv) || isNaN(pageNo) || pageNo < 0) {
             res.status(400).json({ error: 'Invalid parameters' });
             return;
         }
-        else if (dbv === -1) {
-            pageNo = 0;
+        else if (dbv === -1 && pageNo != 0) {
+            res.status(409).json({ error: 'Incompatible page requested' });
+            return;
         }
         else if (dbv != lastUpdateTimestamp) {
             res.status(409).json({ error: 'dbv mismatch' });
