@@ -83,11 +83,11 @@ async function main(){
             res.status(400).json({ error: 'Invalid parameters' });
             return;
         }
-        else if (dbv === -1 && pageNo != 0) {
+        else if (dbv == -1 && pageNo != 0) {
             res.status(409).json({ error: 'Incompatible page requested' });
             return;
         }
-        else if (dbv != lastUpdateTimestamp) {
+        else if (dbv !=-1 && dbv != lastUpdateTimestamp) {
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
