@@ -79,8 +79,9 @@ export async function getNewRows(fuuClient, lastUpdateTimestamp){
 export async function updateMemoryDb(memClient, newRows){
     try{
         const insert = memClient.prepare(`
-            INSERT INTO PICKS (BEATMAP_ID, PICKER_ID, PICK_DATE)
-            VALUES (@BEATMAP_ID, @PICKER_ID, @PICK_DATE);
+            INSERT INTO PICKS (BEATMAP_ID, PICKER_ID, PICK_DATE) 
+            VALUES (@BEATMAP_ID, @PICKER_ID, @PICK_DATE)
+            ON CONFLICT(BEATMAP_ID, PICKER_ID) DO UPDATE SET PICK_DATE = excluded.PICK_DATE;
         `);
         for (const row of newRows) {
             insert.run(row);

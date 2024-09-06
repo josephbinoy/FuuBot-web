@@ -162,7 +162,7 @@ export async function hydrateRedisFromBackup(redisClient){
             logger.info(`Error: ${error.message}`);
             return;
         }
-        updateProgressBar(i + 1, totalRows);
+        // updateProgressBar(i + 1, totalRows);
     }
     logger.info('Hydration complete');
     db.close();
