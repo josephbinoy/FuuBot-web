@@ -71,7 +71,7 @@ async function main(){
     loadFromBackup(memClient);
     memClient.pragma('journal_mode = WAL');
 
-    app.get('/api/getdbv', (req, res) => {
+    app.get('/api/dbv', (req, res) => {
         res.json({ dbv: lastUpdateTimestamp });
     });
 

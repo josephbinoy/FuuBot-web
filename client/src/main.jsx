@@ -5,6 +5,7 @@ import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
 import { DbvProvider } from "./context/DbvProvider";
+import { AlertProvider } from "./context/AlertProvider";
 
 const theme = {
   navbar: {
@@ -94,8 +95,10 @@ const theme = {
 };
 ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider value={theme}>
-      <DbvProvider>
-        <App />
-      </DbvProvider>
+      <AlertProvider>
+        <DbvProvider>
+          <App />
+        </DbvProvider>
+      </AlertProvider>
     </ThemeProvider>
 );

@@ -3,12 +3,13 @@ import { SkeletonItem } from "./SkeletonItem";
 import axios from 'axios';
 import { useDbv } from "../context/DbvProvider";
 import { useEffect, useState, useRef } from 'react';
-import { Alert } from "@material-tailwind/react";
+import { useAlert } from "../context/AlertProvider";
+
 
 export default function MapTable( { tableType }) {
     const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
     const [pageNo, setPageNo] = useState(0);
-    const [open, setOpen] = useState(false);
+    const { setalertMsg } = useAlert();
     const [dataEnd, setDataEnd] = useState(false);
     const observer = useRef();
     const { dbv } = useDbv();
@@ -38,7 +39,10 @@ export default function MapTable( { tableType }) {
                 setRows(prevRows => prevRows.filter(row => row !== null));
                 console.log('Error fetching data:', error);
                 if(error.response.data.error==='dbv mismatch'){
-                    setOpen(true);
+                    setalertMsg("Database updated! Refresh the page for fresh data")
+                }
+                if(error.response.data.error==='Incompatible page requested'){
+                    setalertMsg("Error fetching data. Try disabling adblocker and try again")
                 }
             }
         };
@@ -78,18 +82,6 @@ export default function MapTable( { tableType }) {
             {rows.map((row, index) => row ? <MapItem key={index} tabletype={tableType} mapId={row.BEATMAP_ID} mapName={row.t} mapArtist={row.a} mapper={row.m} mapCount={row.pick_count} imageUrl={`https://assets.ppy.sh/beatmaps/${row.BEATMAP_ID}/covers/slimcover.jpg`}/> : <SkeletonItem key={index} />)}
             <div id={`${tableType}-sentinel`} className="h-1"></div>
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}
-            <Alert
-                className="absolute bottom-3 left-3"
-                open={open}
-                color="blue-gray"
-                onClose={() => setOpen(false)}
-                animate={{
-                mount: { y: 0 },
-                unmount: { y: -20 },
-                }}
-            >
-                Database updated! Refresh the page for fresh data
-            </Alert>
         </div>
     );
 }

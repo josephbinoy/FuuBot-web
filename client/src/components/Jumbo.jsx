@@ -2,6 +2,7 @@ import { ButtonGroup, Button } from "@material-tailwind/react";
 import { useDbv } from "../context/DbvProvider.jsx";
 import axios from 'axios';
 import { useEffect, useState } from "react";
+import { useAlert } from "../context/AlertProvider.jsx";
 
 export function timeAgo(timestamp) {
     const dateString = new Date(timestamp * 1000).toISOString();
@@ -32,11 +33,12 @@ export function timeAgo(timestamp) {
 }
 export default function Jumbo({tab, currentTable, setcurrentTable}) {
     const { setDbv } = useDbv();
+    const { setalertMsg } = useAlert();
     const [lastUpdate, setLastUpdate] = useState(0);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`/api/getdbv`);
+                const response = await axios.get(`/api/dbv`);
                 setDbv(response.data.dbv);
                 const updateLastUpdate = () => {
                     setLastUpdate(timeAgo(response.data.dbv)); //stale closure is okay :)
@@ -47,6 +49,7 @@ export default function Jumbo({tab, currentTable, setcurrentTable}) {
                 return () => clearInterval(displayInterval);
             } catch (error) {
                 console.log('Error fetching stats:', error);
+                setalertMsg("Error fetching data. Try disabling adblocker and try again")
             }
         };
         fetchData();
