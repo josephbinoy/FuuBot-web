@@ -143,7 +143,7 @@ export async function hydrateRedisFromBackup(redisClient){
         return;
     }
     const totalRows = rows.length;
-    logger.info('Hydrating Redis with beatmap metadata...\n');
+    logger.info('Hydrating Redis with beatmap metadata...');
     let a, t, m;
     for (let i = 0; i < totalRows; i++) {
         const row = rows[i];
