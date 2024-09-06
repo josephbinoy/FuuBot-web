@@ -11,7 +11,7 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, imageUrl, ma
     return (
       <a href={`https://osu.ppy.sh/beatmapsets/${mapId}`} className="mx-auto max-w-screen-xl w-11/12 my-2">
         <div
-          className={`flex items-center justify-between bg-cover bg-center h-20 rounded-lg px-6 font-visby font-bold text-2xl text-opacity-80 shadow-osuslate-200/20 shadow-lg text-white border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 hover:opacity-80`}
+          className={`flex items-center justify-between bg-cover bg-center h-20 rounded-lg px-6 font-visby font-bold text-2xl text-opacity-80 shadow-osuslate-200/20 shadow-lg text-white border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 hover:opacity-85`}
           style={{
                 backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.7) 100%), url(${imageUrl})`
               }}
