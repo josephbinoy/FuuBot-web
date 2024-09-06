@@ -36,7 +36,7 @@ export default function Jumbo({tab, currentTable, setcurrentTable}) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`/api/stats`);
+                const response = await axios.get(`/api/getdbv`);
                 setDbv(response.data.dbv);
                 const updateLastUpdate = () => {
                     setLastUpdate(timeAgo(response.data.dbv)); //stale closure is okay :)
