@@ -38,7 +38,7 @@ export function loadFromBackup(memClient){
             CREATE INDEX IF NOT EXISTS idx_beatmap_id ON PICKS (BEATMAP_ID);
             CREATE INDEX IF NOT EXISTS idx_pick_date ON PICKS (PICK_DATE);
             CREATE INDEX IF NOT EXISTS idx_date_beatmap ON PICKS (PICK_DATE, BEATMAP_ID);
-            ATTACH DATABASE 'backup.db' AS back;
+            ATTACH DATABASE ${process.env.BACKUP_DB_PATH} AS back;
             INSERT INTO main.PICKS SELECT * FROM back.PICKS;
             DETACH DATABASE back;
         `);
@@ -53,7 +53,7 @@ export function getMemoryClient(){
 }
 
 export function vacuumBackup(){
-    const backupClient = new Database('backup.db');
+    const backupClient = new Database(process.env.BACKUP_DB_PATH);
     try{
         backupClient.exec('VACUUM;');
         logger.info('Successfully vacuumed backup DB');
