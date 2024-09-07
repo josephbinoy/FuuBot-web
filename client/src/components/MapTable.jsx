@@ -41,8 +41,11 @@ export default function MapTable( { tableType }) {
                 if(error.response.data.error==='dbv mismatch'){
                     setalertMsg("Database updated! Refresh the page for fresh data")
                 }
-                if(error.response.data.error==='Incompatible page requested'){
+                else if(error.response.data.error==='Incompatible page requested'){
                     setalertMsg("Error fetching data. Try disabling adblocker and try again")
+                }
+                else{
+                    setalertMsg("Error fetching data")
                 }
             }
         };

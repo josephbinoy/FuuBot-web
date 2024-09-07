@@ -3,7 +3,8 @@ import 'dotenv/config'
 import { getFuuBotClient, getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, getNewRows, updateMemoryDb } from "./utils/dbHelpers.js";
 import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedisFromFuuBot, deleteCache } from "./utils/redisHelpers.js";
 import logger from "./utils/Logger.js";
-import { addCleanupListener } from "async-cleanup";
+import { addCleanupListener, exitAfterCleanup } from "async-cleanup";
+import readline from 'readline';
 
 const app = express();
 const fuuClient = getFuuBotClient();
@@ -148,5 +149,16 @@ addCleanupListener(async () => {
     if (redisMeta) {
         await redisMeta.quit();
         logger.info('Redis meta connection closed.');
+    }
+});
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on('line', async (input) => {
+    if (input.trim().toLowerCase() === 'close') {
+        await exitAfterCleanup(0);
     }
 });
