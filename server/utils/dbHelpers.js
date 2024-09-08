@@ -1,5 +1,5 @@
 import Database from "better-sqlite3"
-import logger from "./Logger.js"
+import { sqliteLogger } from "./Logger.js";
 
 export function getFuuBotClient(){
     let fuubotDbClient;
@@ -8,10 +8,10 @@ export function getFuuBotClient(){
             readonly: true,
             fileMustExist: true
         })
-        logger.info('Successfully connected to FuuBot DB');
+        sqliteLogger.info('Successfully connected to FuuBot DB');
         
     } catch (error) {
-        logger.error("Error connecting to FuuBot DB", error)
+        sqliteLogger.error("Error connecting to FuuBot DB", error)
     }
     return fuubotDbClient;
 }
@@ -19,10 +19,10 @@ export function getFuuBotClient(){
 export async function backupFuuBotDb(fuuClient){
     try{
         await fuuClient.backup(process.env.BACKUP_DB_PATH);
-        logger.info('Successfully backed up FuuBot DB');
+        sqliteLogger.info('Successfully backed up FuuBot DB');
 
     } catch (error) {
-        logger.error("Error backing up or vacuuming FuuBot DB", error);
+        sqliteLogger.error("Error backing up FuuBot DB", error);
     }
 }
 
@@ -42,9 +42,9 @@ export function loadFromBackup(memClient){
             INSERT INTO main.PICKS SELECT * FROM back.PICKS;
             DETACH DATABASE back;
         `);
-        logger.info('Successfully loaded FuuBot DB to memory');
+        sqliteLogger.info('Successfully loaded FuuBot DB to memory');
     } catch (error) {
-        logger.error("Error loading FuuBot DB to memory", error);
+        sqliteLogger.error("Error loading FuuBot DB to memory", error);
     }
 }
 
@@ -56,27 +56,27 @@ export function vacuumBackup(){
     const backupClient = new Database(process.env.BACKUP_DB_PATH);
     try{
         backupClient.exec('VACUUM;');
-        logger.info('Successfully vacuumed backup DB');
+        sqliteLogger.info('Successfully vacuumed backup DB');
     } catch (error) {
-        logger.error("Error vacuuming backup DB", error);
+        sqliteLogger.error("Error vacuuming backup DB", error);
     }
     backupClient.close();
 }
 
-export async function getNewRows(fuuClient, lastUpdateTimestamp){
+export function getNewRows(fuuClient, lastUpdateTimestamp){
     try{
         const newRows = fuuClient.prepare(`
             SELECT * FROM PICKS
             WHERE PICK_DATE > ${lastUpdateTimestamp};
         `).all();
-        logger.info(`Found ${newRows.length} new rows in FuuBot DB`);
+        sqliteLogger.info(`Found ${newRows.length} new rows in FuuBot DB`);
         return newRows;
     } catch (error) {
-        logger.error("Error fetchng new rows from FuuBot DB", error);
+        sqliteLogger.error("Error fetchng new rows from FuuBot DB", error);
     }
 }
 
-export async function updateMemoryDb(memClient, newRows){
+export function updateMemoryDb(memClient, newRows){
     try{
         const insert = memClient.prepare(`
             INSERT INTO PICKS (BEATMAP_ID, PICKER_ID, PICK_DATE) 
@@ -86,8 +86,8 @@ export async function updateMemoryDb(memClient, newRows){
         for (const row of newRows) {
             insert.run(row);
         }
-        logger.info('Successfully updated memory DB');
+        sqliteLogger.info('Successfully updated memory DB');
     } catch (error) {
-        logger.error("Error updating memory DB", error);
+        sqliteLogger.error("Error updating memory DB", error);
     }
 }

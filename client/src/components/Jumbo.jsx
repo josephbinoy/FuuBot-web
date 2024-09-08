@@ -3,6 +3,7 @@ import { useDbv } from "../context/DbvProvider.jsx";
 import axios from 'axios';
 import { useEffect, useState } from "react";
 import { useAlert } from "../context/AlertProvider.jsx";
+import { Link } from "react-router-dom";
 
 export function timeAgo(timestamp) {
     const dateString = new Date(timestamp * 1000).toISOString();
@@ -31,14 +32,14 @@ export function timeAgo(timestamp) {
         return `${seconds} seconds ago`;
     }
 }
-export default function Jumbo({tab, currentTable, setcurrentTable}) {
+export default function Jumbo({currentTable, setcurrentTable}) {
     const { setDbv } = useDbv();
     const { setalertMsg } = useAlert();
     const [lastUpdate, setLastUpdate] = useState(0);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`/api/dbv`);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/dbv`);
                 setDbv(response.data.dbv);
                 const updateLastUpdate = () => {
                     setLastUpdate(timeAgo(response.data.dbv)); //stale closure is okay :)
@@ -55,9 +56,9 @@ export default function Jumbo({tab, currentTable, setcurrentTable}) {
         fetchData();
     }, []);
     return (
-        <div className="mx-auto max-w-screen-xl flex items-center justify-between h-40">
-            <h1 className="text-4xl text-osuslate-50 font-black px-10">Popular {tab}</h1>
-            <p className="absolute  bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80">{lastUpdate && `Last updated ${lastUpdate}`}</p>
+        <div className=" relative mx-auto max-w-screen-xl flex items-center justify-between h-40">
+            <h1 className="text-5xl text-osuslate-50 font-black px-10">Popular Beatmaps</h1>
+            <p className="fixed  bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80">{lastUpdate && `Last updated ${lastUpdate}`}</p>
             <ButtonGroup fullWidth ripple={false} size="lg" color="blue-gray">
                 <Button onClick={() => setcurrentTable('weekly')}>
                     <p className={`${currentTable === 'weekly' && 'text-white -translate-y-px'}`}>weekly</p>
@@ -72,6 +73,7 @@ export default function Jumbo({tab, currentTable, setcurrentTable}) {
                     <p className={`${currentTable === 'alltime' && 'text-white -translate-y-px'}`}>alltime</p>
                 </Button>
             </ButtonGroup>
+            <Link to="blacklist" className="absolute bottom-0 right-10 xl:right-1 text-osuslate-100">View Blacklisted Maps</Link>
         </div>
     )
 }

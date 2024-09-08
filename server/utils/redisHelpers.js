@@ -1,22 +1,22 @@
 import { createClient } from 'redis';
 import Database from 'better-sqlite3';
 import axios from 'axios';
-import logger from './Logger.js';
+import { redisLogger } from './Logger.js';
 
 export async function getRedisCacheClient() {
     const client = createClient({
         url: process.env.REDIS_CACHE_URL
     });
     client.on('error', async err => {
-        logger.error('Redis Cache Client Error:', err);
+        redisLogger.error('Redis Cache Client Error:', err);
         throw new Error('Redis Cache Client Error', err);
     });
     await client.connect();
     if (client.isReady) {
-        logger.info('Redis Cache Client connected successfully');
+        redisLogger.info('Redis Cache Client connected successfully');
         return client;
     } else {
-        logger.error('Redis Cache Client failed to connect');
+        redisLogger.error('Redis Cache Client failed to connect');
     }
 }
 
@@ -25,15 +25,15 @@ export async function getRedisMetaClient() {
         url: process.env.REDIS_META_URL
     });
     client.on('error', async err => {
-        logger.error('Redis Metadata Client Error:', err);
+        redisLogger.error('Redis Metadata Client Error:', err);
         throw new Error('Redis Metadata Client Error', err);
     });
     await client.connect();
     if (client.isReady) {
-        logger.info('Redis Metadata Client connected successfully');
+        redisLogger.info('Redis Metadata Client connected successfully');
         return client;
     } else {
-        logger.error('Redis Meta Client failed to connect');
+        redisLogger.error('Redis Meta Client failed to connect');
     }
 }
 
@@ -48,13 +48,13 @@ async function getGuestToken() {
         });
 
         if (response.status == 200 && response.data) {
-            logger.info('Fetched guest token.');
+            redisLogger.info('Fetched guest token.');
             return response.data.access_token;
         } else {
-            logger.error(`Error: couldn't get guest token. Received status code ${response.status}`);
+            redisLogger.error(`Error: couldn't get guest token. Received status code ${response.status}`);
         }
     } catch (error) {
-        logger.error(`Error couldn't get guest token: ${error.message}`);
+        redisLogger.error(`Error couldn't get guest token: ${error.message}`);
     }
 }
 
@@ -83,10 +83,10 @@ export async function fetchBeatmapsetMetadata(beatmapsetId, bearerToken) {
               };
           }
       } else {
-         logger.info(`Error: Received status code ${response.status}`);
+         redisLogger.info(`Error: Received status code ${response.status}`);
       }
       } catch (error) {
-         logger.info(`Error: ${error.message}`);
+         redisLogger.info(`Error: ${error.message}`);
       }
 }
 
@@ -100,10 +100,10 @@ function updateProgressBar(current, total) {
     }
 }
 
-export async function hydrateRedisFromFuuBot(redisClient, rows){
+export async function hydrateRedis(redisClient, rows){
     const bearerToken = await getGuestToken();
     if (!bearerToken) return;
-    logger.info('Hydrating Redis with beatmap metadata...');
+    redisLogger.info('Hydrating Redis with beatmap metadata from new rows/blacklist...');
     let a, t, m;
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
@@ -119,11 +119,11 @@ export async function hydrateRedisFromFuuBot(redisClient, rows){
                 await new Promise(resolve => setTimeout(resolve, 70));
             }
         } catch (error) {
-            logger.info(`Error: ${error.message}`);
+            redisLogger.info(`Error: ${error.message}`);
             return;
         }
     }
-    logger.info('Hydration complete');
+    redisLogger.info('Hydration complete');
 }
 
 export async function hydrateRedisFromBackup(redisClient){
@@ -137,13 +137,13 @@ export async function hydrateRedisFromBackup(redisClient){
     let rows = [];
     try{
         rows = db.prepare('SELECT DISTINCT BEATMAP_ID FROM PICKS;').all();
-        logger.info(`Found ${rows.length} unique beatmaps`);
+        redisLogger.info(`Found ${rows.length} unique beatmaps`);
     } catch (error) {
-        logger.error(`Error: ${error.message}`);
+        redisLogger.error(`Error: ${error.message}`);
         return;
     }
     const totalRows = rows.length;
-    logger.info('Hydrating Redis with beatmap metadata...');
+    redisLogger.info('Hydrating Redis with beatmap metadata from backup DB...');
     let a, t, m;
     for (let i = 0; i < totalRows; i++) {
         const row = rows[i];
@@ -159,11 +159,11 @@ export async function hydrateRedisFromBackup(redisClient){
                 await new Promise(resolve => setTimeout(resolve, 70));
             }
         } catch (error) {
-            logger.info(`Error: ${error.message}`);
+            redisLogger.info(`Error: ${error.message}`);
             return;
         }
     }
-    logger.info('Hydration complete');
+    redisLogger.info('Hydration complete');
     db.close();
 }
 
@@ -174,12 +174,12 @@ export async function deleteCache(redisClient) {
             keysToDelete.push(key);
         }
         if (keysToDelete.length === 0) {
-            logger.info('Cache already empty');
+            redisLogger.info('Cache already empty');
             return;
         }
         await redisClient.del(keysToDelete);
-        logger.info('Successfully deleted cache');
+        redisLogger.info('Successfully deleted cache');
     } catch (error) {
-        logger.error('Error deleting cache:', error);
+        redisLogger.error('Error deleting cache:', error);
     }
 }

@@ -9,50 +9,31 @@ import {
   PopoverContent
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { NavLink } from "react-router-dom";
  
-function NavList({tab}) {
+function NavList() {
   return (
     <ul className="my-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-      <Typography
-        as="li"
-        variant="h4"
-        className="p-1 font-extrabold"
-      >
-        <a href="#" className={`flex items-center hover:text-osuslate-50 hover:-translate-y-px hover:scale-105 ${tab === 'beatmaps' && 'text-osuslate-50 -translate-y-px scale-105'}`}>
+      <NavLink to={"/"} className={({ isActive }) => isActive ? 'text-osuslate-50 scale-110' : ''} >
+        <Typography
+          as="li"
+          variant="h4"
+          className="p-1 font-extrabold font-visby"
+        >
           Beatmaps
-        </a>
-      </Typography>
+        </Typography>
+      </NavLink>
       <Popover placement="bottom" offset={-32} >
       <PopoverHandler>
-      <Typography
-        as="li"
-        variant="h4"
-        className="p-1 font-extrabold"
-      >
-        <a href="#" className={`flex items-center hover:text-osuslate-50 hover:-translate-y-px hover:scale-105 ${tab === 'artists' && 'text-osuslate-50 -translate-y-px scale-105'}`}>
-          Artists
-        </a>
-      </Typography>
-      </PopoverHandler>
-      <PopoverContent className="z-[999] overflow-hidden p-0"> 
-          <div className="h-28 w-28">
-            <img
-              src="https://media1.tenor.com/m/lYbTKdA7da4AAAAC/40hara-kinako.gif"
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
-      <Popover placement="bottom" offset={-32} >
-      <PopoverHandler>
-      <Typography
-        as="li"
-        variant="h4"
-        className="p-1 font-extrabold"
-      >
-        <a href="#" className={`flex items-center hover:text-osuslate-50 hover:-translate-y-px hover:scale-105 ${tab === 'mappers' && 'text-osuslate-50 -translate-y-px scale-105'}`}>
-          Mappers
-        </a>
-      </Typography>
+      <NavLink to={"#"}>
+        <Typography
+          as="li"
+          variant="h4"
+          className="p-1 font-extrabold font-visby"
+        >
+          Players
+        </Typography>
+      </NavLink>
       </PopoverHandler>
       <PopoverContent className="z-[999] overflow-hidden p-0"> 
           <div className="h-28 w-28">
@@ -66,7 +47,7 @@ function NavList({tab}) {
   );
 }
  
-export default function CustomNavbar({ tab }) {
+export default function CustomNavbar() {
   const [openNav, setOpenNav] = useState(false);
  
   const handleWindowResize = () =>
@@ -97,7 +78,7 @@ export default function CustomNavbar({ tab }) {
           </Typography>
         </div>
         <div className="hidden lg:block">
-          <NavList tab={tab}/>
+          <NavList />
         </div>
         <IconButton
           variant="text"
@@ -113,7 +94,7 @@ export default function CustomNavbar({ tab }) {
         </IconButton>
       </div>
       <Collapse open={openNav}>
-        <NavList tab={tab}/>
+        <NavList />
       </Collapse>
     </Navbar>
   );

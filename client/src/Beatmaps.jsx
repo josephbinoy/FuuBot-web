@@ -5,14 +5,13 @@ import { useState } from "react"
 import { Alert } from "@material-tailwind/react";
 import { useAlert } from "./context/AlertProvider";
 
-export default function App() {
+export default function Beatmaps() {
   const [currentTable, setcurrentTable] = useState('weekly');
-  const [currentTab, setcurrentTab] = useState('beatmaps');
   const { alertMsg, setalertMsg } = useAlert();
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
-      <CustomNavbar tab={currentTab} />
-      <Jumbo tab={currentTab} currentTable = {currentTable} setcurrentTable = {setcurrentTable} />
+      <CustomNavbar />
+      <Jumbo currentTable = {currentTable} setcurrentTable = {setcurrentTable} />
       <div style={{ display: currentTable === 'weekly' ? 'block' : 'none' }}>
         <MapTable tableType='weekly'/>
       </div>

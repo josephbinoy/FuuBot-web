@@ -17,5 +17,8 @@
     "express": "^4.19.2",
     "log4js": "^6.9.1",
     "redis": "^4.7.0"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5"
   }
 }

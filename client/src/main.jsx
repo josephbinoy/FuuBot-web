@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import { createBrowserRouter,  RouterProvider } from "react-router-dom";
+import Beatmaps from "./Beatmaps";
+import Blacklist from "./Blacklist";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
@@ -93,11 +95,22 @@ const theme = {
     },
   },
 };
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (<Beatmaps />),
+  },
+  {
+    path: "blacklist",
+    element: (<Blacklist />),
+  },
+]);
 ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider value={theme}>
       <AlertProvider>
         <DbvProvider>
-          <App />
+          <RouterProvider router={router} />
         </DbvProvider>
       </AlertProvider>
     </ThemeProvider>
