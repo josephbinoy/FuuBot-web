@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect, useState } from "react";
 import { useAlert } from "../context/AlertProvider.jsx";
 import { Link } from "react-router-dom";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export function timeAgo(timestamp) {
     const dateString = new Date(timestamp * 1000).toISOString();
@@ -73,7 +74,7 @@ export default function Jumbo({currentTable, setcurrentTable}) {
                     <p className={`${currentTable === 'alltime' && 'text-white -translate-y-px'}`}>alltime</p>
                 </Button>
             </ButtonGroup>
-            <Link to="blacklist" className="absolute bottom-0 right-10 xl:right-1 text-osuslate-100">View Blacklisted Maps</Link>
+            <Link to="blacklist" className="absolute bottom-0 right-10 xl:right-1 text-osuslate-100 flex items-center">View Blacklisted Maps <ChevronRightIcon className="h-5 w-5 ml-1" strokeWidth={3}/></Link>
         </div>
     )
 }

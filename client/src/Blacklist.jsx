@@ -3,6 +3,8 @@ import BlackItem from "./components/BlackItem"
 import { SkeletonItem } from "./components/SkeletonItem";
 import axios from "axios"
 import { useState, useEffect } from "react";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 export default function Blacklist() {
     const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
@@ -30,7 +32,10 @@ export default function Blacklist() {
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
         <CustomNavbar />
-        <div className="mx-auto max-w-screen-xl flex items-center justify-between h-40">
+        <div className="relative mx-auto max-w-screen-xl flex items-center justify-between h-40">
+            <Link to="/" className="absolute top-0 left-0 m-2 text-lg text-osuslate-100 font-extrabold flex items-center">
+                <ChevronLeftIcon className="h-5 w-5 mr-1" strokeWidth={3} />Back
+            </Link>
             <h1 className="text-5xl text-osuslate-50 font-black px-10">Blacklisted Beatmaps</h1>
         </div>
         <div className="flex flex-col">
