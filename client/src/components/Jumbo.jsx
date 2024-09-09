@@ -74,7 +74,7 @@ export default function Jumbo({currentTable, setcurrentTable}) {
                     <p className={`${currentTable === 'alltime' && 'text-white -translate-y-px'}`}>alltime</p>
                 </Button>
             </ButtonGroup>
-            <Link to="blacklist" className="absolute bottom-0 right-10 xl:right-1 text-osuslate-100 flex items-center">View Blacklisted Maps <ChevronRightIcon className="h-5 w-5 ml-1" strokeWidth={3}/></Link>
+            <Link to="blacklist" className="absolute bottom-0 right-10 xl:right-1 text-osuslate-100 flex items-center opacity-70">View Blacklisted Maps <ChevronRightIcon className="h-5 w-5 ml-1 opacity-80" strokeWidth={3}/></Link>
         </div>
     )
 }
