@@ -9,12 +9,12 @@ import {
   PopoverContent
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
  
 function NavList() {
   return (
     <ul className="my-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-      <NavLink to={"/"} className={({ isActive }) => isActive ? 'text-osuslate-50 scale-110' : ''} >
+      <NavLink to={"/"} className={({ isActive }) => isActive ? 'text-osuslate-50 scale-105' : ''} >
         <Typography
           as="li"
           variant="h4"
@@ -67,8 +67,8 @@ export default function CustomNavbar() {
         <div className="flex justify-evenly items-center hover:opacity-70 opacity-60">
           <img src="/logo.png" alt="logo" className="h-8 mx-1 mt-1"></img>
           <Typography
-            as="a"
-            href="#"
+            as={Link}
+            to={"/"}
             variant="h2"
             color="blue-gray"
             textGradient={true}
