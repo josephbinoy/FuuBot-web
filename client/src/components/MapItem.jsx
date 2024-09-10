@@ -24,7 +24,7 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, imageUrl, ma
                 <p className="truncate">{mapArtist} •<span className="text-gray-500"> Mapped by {mapper}</span></p>
               </div>
             </div>
-            <p>{mapCount}</p>
+            <p className="z-10 pointer-events-none">{mapCount}</p>
         </div>
       </a>
     )

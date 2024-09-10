@@ -105,6 +105,10 @@ const router = createBrowserRouter([
     path: "blacklist",
     element: (<Blacklist />),
   },
+  {
+    path: "history/:beatmapId",
+    element: (<History />),
+  }
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider value={theme}>
