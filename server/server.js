@@ -119,7 +119,7 @@ async function main(){
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
                 if (cachedResult) {            
-                    setTimeout(()=>res.json(JSON.parse(cachedResult)), 2000);
+                    es.json(JSON.parse(cachedResult));
                     return;
                 }
             }
