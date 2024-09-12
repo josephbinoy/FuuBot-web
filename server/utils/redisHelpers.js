@@ -112,34 +112,13 @@ export async function fetchBeatmapsetMetadata(beatmapsetId, bearerToken) {
                   s: response.data.status,
                   sdate:response.data.submitted_date
               }
-          } else {
-              return {
-                a: 'Missing',
-                t: 'Missing',
-                m: 'Missing',
-                mid: 'Missing',
-                fc: 'Missing',
-                pc: 'Missing',
-                s: 'Missing',
-                sdate: 'Missing'
-              };
           }
       } else {
-         redisLogger.info(`Error: Received status code ${response.status}`);
+         redisLogger.error(`Error: Received status code ${response.status}`);
       }
       } catch (error) {
-         redisLogger.info(`Error: ${error.message}`);
+         redisLogger.error(`Error: ${error.message}`);
       }
-}
-
-function updateProgressBar(current, total) {
-    const barWidth = 50;
-    const progress = (current / total) * barWidth;
-    const progressBar = '█'.repeat(Math.round(progress)) + ' '.repeat(barWidth - Math.round(progress));
-    process.stdout.write(`\r[${progressBar}] ${Math.round((current / total) * 100)}%`);
-    if (current === total) {
-        process.stdout.write('\n\n');
-    }
 }
 
 export async function hydrateRedis(redisClient, rows){
@@ -156,7 +135,7 @@ export async function hydrateRedis(redisClient, rows){
         try {
             if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
-                if (!metadata || metadata.t == 'Missing'){
+                if (!metadata){
                     redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
                     continue;
                 }
@@ -174,7 +153,6 @@ export async function hydrateRedis(redisClient, rows){
             }
         } catch (error) {
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
-            return;
         }
     }
     redisLogger.info('Hydrating Redis with player data from new rows...');
@@ -257,8 +235,8 @@ export async function hydrateRedisFromBackup(redisClient){
         try {
             // if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
-                if (!metadata || metadata.t == 'Missing'){
-                    redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${metadata.t}`);
+                if (!metadata){
+                    redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
                     continue;
                 }
                 await new Promise(resolve => setTimeout(resolve, 70));
@@ -275,7 +253,6 @@ export async function hydrateRedisFromBackup(redisClient){
             // }
         } catch (error) {
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
-            return;
         }
         if (i % Math.ceil(totalRows / 10) === 0) {
             redisLogger.info(`${Math.floor((i / totalRows) * 100)}% complete...`);
