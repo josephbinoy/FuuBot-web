@@ -117,7 +117,7 @@ export async function fetchBeatmapsetMetadata(beatmapsetId, bearerToken) {
          redisLogger.error(`Error: Received status code ${response.status}`);
       }
       } catch (error) {
-         redisLogger.error(`Error: ${error.message}`);
+         redisLogger.error(`Error while fetching beatmap metadata: ${error.message}`);
       }
 }
 
@@ -133,14 +133,14 @@ export async function hydrateRedis(redisClient, rows){
         if (pickerId!=0)
             newPlayerIds.add(pickerId);
         try {
-            if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
+            if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
                 if (!metadata){
                     redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
                     continue;
                 }
                 await new Promise(resolve => setTimeout(resolve, 70));
-                await redisClient.hSet(`osubeatmap:${beatmapId}`, {
+                await redisClient.hSet(`fuubot:beatmap-${beatmapId}`, {
                     t: metadata.t,
                     a: metadata.a,
                     m: metadata.m,
@@ -159,10 +159,10 @@ export async function hydrateRedis(redisClient, rows){
     const playerBuffer = [];
     const apiLimit = 45;
     for (const playerId of newPlayerIds) {
-        // if (!(await redisClient.exists(`osuplayer:${playerId}`))) {
-        //     if(playerId!=0)
+        if (!(await redisClient.exists(`fuubot:player-${playerId}`))) {
+            if(playerId!=0)
                 playerBuffer.push(playerId);
-        // }
+        }
         if (playerBuffer.length === apiLimit) {
             try {
                 const players = await fetchPlayerNames(playerBuffer, bearerToken);
@@ -174,7 +174,7 @@ export async function hydrateRedis(redisClient, rows){
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
-                    await redisClient.hSet(`osuplayer:${player.id}`, {
+                    await redisClient.hSet(`fuubot:player-${player.id}`, {
                         n: player.n,
                         cv: player.cv,
                         con: player.con
@@ -197,7 +197,7 @@ export async function hydrateRedis(redisClient, rows){
             for (let j = 0; j < players.length; j++) {
                 const player = players[j];
                 if (!player.n) continue;
-                await redisClient.hSet(`osuplayer:${player.id}`, {
+                await redisClient.hSet(`fuubot:player-${player.id}`, {
                     n: player.n,
                     cv: player.cv ,
                     con: player.con
@@ -234,14 +234,14 @@ export async function hydrateRedisFromBackup(redisClient){
         const row = rows[i];
         const beatmapId = Number(row.BEATMAP_ID);
         try {
-            if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
+            // if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
                 if (!metadata){
-                    redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
+                    redisLogger.error(`Error hydrating beatmap ${beatmapId}. Skipping...`);
                     continue;
                 }
                 await new Promise(resolve => setTimeout(resolve, 70));
-                await redisClient.hSet(`osubeatmap:${beatmapId}`, {
+                await redisClient.hSet(`fuubot:beatmap-${beatmapId}`, {
                     t: metadata.t,
                     a: metadata.a,
                     m: metadata.m,
@@ -251,7 +251,7 @@ export async function hydrateRedisFromBackup(redisClient){
                     s: metadata.s,
                     sdate: metadata.sdate
                 });
-            }
+            // }
         } catch (error) {
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
         }
@@ -275,10 +275,10 @@ export async function hydrateRedisFromBackup(redisClient){
     const apiLimit = 45;
     for (let i = 0; i < totalRows; i++) {
         const pickerId = Number(rows[i].PICKER_ID);
-        // if (!(await redisClient.exists(`osuplayer:${pickerId}`))) {
-        //     if (pickerId!=0)
+        if (!(await redisClient.exists(`fuubot:player-${pickerId}`))) {
+            if (pickerId!=0)
                 playerBuffer.push(pickerId);
-        // }
+        }
         if (playerBuffer.length === apiLimit) {
             try {
                 const players = await fetchPlayerNames(playerBuffer, bearerToken);
@@ -290,7 +290,7 @@ export async function hydrateRedisFromBackup(redisClient){
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
-                    await redisClient.hSet(`osuplayer:${player.id}`, {
+                    await redisClient.hSet(`fuubot:player-${player.id}`, {
                         n: player.n,
                         cv: player.cv,
                         con: player.con
@@ -316,7 +316,7 @@ export async function hydrateRedisFromBackup(redisClient){
             for (let j = 0; j < players.length; j++) {
                 const player = players[j];
                 if (!player.n) continue;
-                await redisClient.hSet(`osuplayer:${player.id}`, {
+                await redisClient.hSet(`fuubot:player-${player.id}`, {
                     n: player.n,
                     cv: player.cv,
                     con: player.con
@@ -334,7 +334,7 @@ export async function hydrateRedisFromBackup(redisClient){
 export async function deleteCache(redisClient) {
     try {
         const keysToDelete = [];
-        for await (const key of redisClient.scanIterator({MATCH: 'fuubot:*', COUNT: 50})) {
+        for await (const key of redisClient.scanIterator({MATCH: 'fuubot:cache-*', COUNT: 50})) {
             keysToDelete.push(key);
         }
         if (keysToDelete.length === 0) {

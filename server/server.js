@@ -114,7 +114,7 @@ async function main(){
             res.status(400).json({ error: 'Invalid parameters' });
             return;
         }
-        const cacheKey = `fuubot:history-${id}`;
+        const cacheKey = `fuubot:cache-history-${id}`;
         try {
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
@@ -132,13 +132,13 @@ async function main(){
             `;
             const rows = memClient.prepare(query).all(id);
             const history = [];
-            const meta = await redisMeta.hGetAll(`osubeatmap:${id}`);
+            const meta = await redisMeta.hGetAll(`fuubot:beatmap-${id}`);
             if (!meta.t) {  
                 res.status(404).json({ error: 'Beatmap not found' });
                 return;
             }
             for (const row of rows) {
-                const player = await redisMeta.hGetAll(`osuplayer:${row.PICKER_ID}`);
+                const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
                 if (player) {
                     history.push({ id: row.PICKER_ID, ...player, pickDate: row.PICK_DATE });
                 }
@@ -158,7 +158,7 @@ async function main(){
     });
 
     app.get('/api/blacklist', async (req, res) => {
-        const cacheKey = 'fuubot:blacklist';
+        const cacheKey = 'fuubot:cache-blacklist';
         try {
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
@@ -169,7 +169,7 @@ async function main(){
             }
             const result = [];
             for (const row of blacklist) {
-                const meta = await redisMeta.hGetAll(`osubeatmap:${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }
@@ -200,7 +200,7 @@ async function main(){
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
-        const cacheKey = `fuubot:${period}-${pageNo}`;   
+        const cacheKey = `fuubot:cache-${period}-${pageNo}`;   
         try {
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
@@ -216,7 +216,7 @@ async function main(){
             const rows = memClient.prepare(query).all(10, pageNo * 10);
             const result = [];
             for (const row of rows) {
-                const meta = await redisMeta.hGetAll(`osubeatmap:${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }
