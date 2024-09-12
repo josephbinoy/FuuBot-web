@@ -18,7 +18,7 @@ export default function PlayerCard({name, id, country, coverUrl, pickDate}) {
             />
             <p className='text-xl'>{name}</p>
         </div>
-            <p className='text-sm opacity-60 px-2'>{pickDate && `Picked ${timeAgo(pickDate)}`}</p>
+            <p className='text-sm opacity-80 px-2'>{pickDate && `Picked ${timeAgo(pickDate)}`}</p>
         </div>
       </a>
     )

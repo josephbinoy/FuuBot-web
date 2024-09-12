@@ -67,7 +67,7 @@ export default function History() {
             {map.t &&
             <h1 className="absolute bottom-20 w-full text-3xl mx-auto text-gray-300 font-extrabold text-center">This map has been picked by <span className="text-glow-200 text-4xl opacity-70">{data.length}</span> players this week</h1>}
         </div>
-        <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10">
+        <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
             {data.map((row, index) => 
                 row ? <div className="flex items-center justify-between gap-4">
                 <p className="text-2xl text-gray-300">{index+1}</p>
