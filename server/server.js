@@ -133,6 +133,10 @@ async function main(){
             const rows = memClient.prepare(query).all(id);
             const history = [];
             const meta = await redisMeta.hGetAll(`osubeatmap:${id}`);
+            if (!meta.t) {  
+                res.status(404).json({ error: 'Beatmap not found' });
+                return;
+            }
             for (const row of rows) {
                 const player = await redisMeta.hGetAll(`osuplayer:${row.PICKER_ID}`);
                 if (player) {

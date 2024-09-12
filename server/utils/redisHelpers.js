@@ -156,6 +156,10 @@ export async function hydrateRedis(redisClient, rows){
         try {
             if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
+                if (!metadata || metadata.t == 'Missing'){
+                    redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
+                    continue;
+                }
                 await new Promise(resolve => setTimeout(resolve, 70));
                 await redisClient.hSet(`osubeatmap:${beatmapId}`, {
                     t: metadata.t,
@@ -183,9 +187,14 @@ export async function hydrateRedis(redisClient, rows){
         if (playerBuffer.length === apiLimit) {
             try {
                 const players = await fetchPlayerNames(playerBuffer, bearerToken);
+                if (!players){
+                    redisLogger.error(`Error hydrating players: ${players}`);
+                    return;
+                }
                 await new Promise(resolve => setTimeout(resolve, 70));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
+                    if (!player.n) continue;
                     await redisClient.hSet(`osuplayer:${player.id}`, {
                         n: player.n,
                         cv: player.cv,
@@ -194,7 +203,6 @@ export async function hydrateRedis(redisClient, rows){
                 }
             } catch (error) {
                 redisLogger.error(`Error hydrating players: ${error.message}`);
-                return;
             }
             playerBuffer.length = 0;
         }
@@ -202,9 +210,14 @@ export async function hydrateRedis(redisClient, rows){
     if (playerBuffer.length > 0) {
         try {
             const players = await fetchPlayerNames(playerBuffer, bearerToken);
+            if (!players){
+                redisLogger.error(`Error hydrating players: ${players}`);
+                return;
+            }
             await new Promise(resolve => setTimeout(resolve, 70));
             for (let j = 0; j < players.length; j++) {
                 const player = players[j];
+                if (!player.n) continue;
                 await redisClient.hSet(`osuplayer:${player.id}`, {
                     n: player.n,
                     cv: player.cv ,
@@ -213,7 +226,6 @@ export async function hydrateRedis(redisClient, rows){
             }
         } catch (error) {
             redisLogger.error(`Error hydrating remaining players: ${error.message}`);
-            return;
         }
     }
     redisLogger.info('Hydration complete');
@@ -245,6 +257,10 @@ export async function hydrateRedisFromBackup(redisClient){
         try {
             // if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
+                if (!metadata || metadata.t == 'Missing'){
+                    redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${metadata.t}`);
+                    continue;
+                }
                 await new Promise(resolve => setTimeout(resolve, 70));
                 await redisClient.hSet(`osubeatmap:${beatmapId}`, {
                     t: metadata.t,
@@ -288,9 +304,14 @@ export async function hydrateRedisFromBackup(redisClient){
         if (playerBuffer.length === apiLimit) {
             try {
                 const players = await fetchPlayerNames(playerBuffer, bearerToken);
+                if (!players){
+                    redisLogger.error(`Error hydrating players: ${players}`);
+                    return;
+                }
                 await new Promise(resolve => setTimeout(resolve, 70));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
+                    if (!player.n) continue;
                     await redisClient.hSet(`osuplayer:${player.id}`, {
                         n: player.n,
                         cv: player.cv,
@@ -299,7 +320,6 @@ export async function hydrateRedisFromBackup(redisClient){
                 }
             } catch (error) {
                 redisLogger.error(`Error hydrating players: ${error.message}`);
-                return;
             }
             playerBuffer.length = 0;
         }
@@ -310,9 +330,14 @@ export async function hydrateRedisFromBackup(redisClient){
     if (playerBuffer.length > 0) {
         try {
             const players = await fetchPlayerNames(playerBuffer, bearerToken);
+            if (!players){
+                redisLogger.error(`Error hydrating players: ${players}`);
+                return;
+            }
             await new Promise(resolve => setTimeout(resolve, 70));
             for (let j = 0; j < players.length; j++) {
                 const player = players[j];
+                if (!player.n) continue;
                 await redisClient.hSet(`osuplayer:${player.id}`, {
                     n: player.n,
                     cv: player.cv,
@@ -321,7 +346,6 @@ export async function hydrateRedisFromBackup(redisClient){
             }
         } catch (error) {
             redisLogger.error(`Error hydrating remaining players: ${error.message}`);
-            return;
         }
     }
     redisLogger.info('100% complete...');

@@ -27,7 +27,12 @@ export default function History() {
                 setData(response.data.history);
             } catch (error) {
                 setData(prevData => prevData.filter(d => d !== null));
-                setalertMsg("Error fetching data");
+                if(error.response.data.error === "Beatmap not found") {         
+                    setalertMsg("This beatmap has never been picked in the lobby!");
+                }
+                else{
+                    setalertMsg("Error fetching data");
+                }
             }
         };
         fetchData();
@@ -76,9 +81,6 @@ export default function History() {
                 <SkeletonPlayerCard key={index} />
             )}
         </div>
-        {/* <div className="flex mx-auto max-w-screen-lg my-10">
-            <h1 className="text-3xl text-gray-300 font-extrabold text-center">Sorry! This beatmap has never been picked in the lobby!</h1>
-        </div> */}
         <Alert
             className="absolute bottom-3 left-3"
             open={alertMsg !== ""}
