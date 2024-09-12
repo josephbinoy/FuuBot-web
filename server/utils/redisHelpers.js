@@ -139,7 +139,7 @@ export async function hydrateRedis(redisClient, rows){
                     redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
                     continue;
                 }
-                await new Promise(resolve => setTimeout(resolve, 70));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 await redisClient.hSet(`fuubot:beatmap-${beatmapId}`, {
                     t: metadata.t,
                     a: metadata.a,
@@ -170,7 +170,7 @@ export async function hydrateRedis(redisClient, rows){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 70));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
@@ -193,7 +193,7 @@ export async function hydrateRedis(redisClient, rows){
                 redisLogger.error(`Error hydrating players: ${players}`);
                 return;
             }
-            await new Promise(resolve => setTimeout(resolve, 70));
+            await new Promise(resolve => setTimeout(resolve, 100));
             for (let j = 0; j < players.length; j++) {
                 const player = players[j];
                 if (!player.n) continue;
@@ -234,13 +234,13 @@ export async function hydrateRedisFromBackup(redisClient){
         const row = rows[i];
         const beatmapId = Number(row.BEATMAP_ID);
         try {
-            // if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
+            if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
                 if (!metadata){
                     redisLogger.error(`Error hydrating beatmap ${beatmapId}. Skipping...`);
                     continue;
                 }
-                await new Promise(resolve => setTimeout(resolve, 70));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 await redisClient.hSet(`fuubot:beatmap-${beatmapId}`, {
                     t: metadata.t,
                     a: metadata.a,
@@ -251,7 +251,7 @@ export async function hydrateRedisFromBackup(redisClient){
                     s: metadata.s,
                     sdate: metadata.sdate
                 });
-            // }
+            }
         } catch (error) {
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
         }
@@ -286,7 +286,7 @@ export async function hydrateRedisFromBackup(redisClient){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 70));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
@@ -312,7 +312,7 @@ export async function hydrateRedisFromBackup(redisClient){
                 redisLogger.error(`Error hydrating players: ${players}`);
                 return;
             }
-            await new Promise(resolve => setTimeout(resolve, 70));
+            await new Promise(resolve => setTimeout(resolve, 100));
             for (let j = 0; j < players.length; j++) {
                 const player = players[j];
                 if (!player.n) continue;
