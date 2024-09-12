@@ -69,8 +69,8 @@ export default function History() {
         </div>
         <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
             {data.map((row, index) => 
-                row ? <div className="flex items-center justify-between gap-4">
-                <p className="text-2xl text-gray-300">{index+1}</p>
+                row ? <div className="flex items-center justify-between gap-1">
+                <p className="text-2xl text-gray-300 w-10 text-center">{index+1}</p>
                 <div className="flex-grow">
                     <PlayerCard 
                         key={index} 
