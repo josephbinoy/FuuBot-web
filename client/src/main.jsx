@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter,  RouterProvider } from "react-router-dom";
 import Beatmaps from "./Beatmaps";
 import Blacklist from "./Blacklist";
+import History from "./History";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";

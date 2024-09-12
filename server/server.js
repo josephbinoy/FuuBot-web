@@ -108,6 +108,51 @@ async function main(){
         res.json({ dbv: lastUpdateTimestamp });
     });
 
+    app.get('/api/history/:id', async (req, res) => {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            res.status(400).json({ error: 'Invalid parameters' });
+            return;
+        }
+        const cacheKey = `fuubot:history-${id}`;
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {            
+                    setTimeout(()=>res.json(JSON.parse(cachedResult)), 2000);
+                    return;
+                }
+            }
+            const query = `
+                SELECT PICKER_ID, PICK_DATE
+                FROM PICKS 
+                WHERE BEATMAP_ID = ?
+                AND PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
+                ORDER BY PICK_DATE DESC
+            `;
+            const rows = memClient.prepare(query).all(id);
+            const history = [];
+            const meta = await redisMeta.hGetAll(`osubeatmap:${id}`);
+            for (const row of rows) {
+                const player = await redisMeta.hGetAll(`osuplayer:${row.PICKER_ID}`);
+                if (player) {
+                    history.push({ id: row.PICKER_ID, ...player, pickDate: row.PICK_DATE });
+                }
+            }
+            const result = { 
+                beatmap: meta, 
+                history: history 
+            };
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }        
+            res.json(result);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.get('/api/blacklist', async (req, res) => {
         const cacheKey = 'fuubot:blacklist';
         try {
@@ -135,7 +180,7 @@ async function main(){
         }
     });
 
-    app.get('/api/:period', async (req, res) => {
+    app.get('/api/beatmaps/:period', async (req, res) => {
         const { period } = req.params;
         let pageNo = parseInt(req.query.pageNo);
         const dbv = parseInt(req.query.dbv);

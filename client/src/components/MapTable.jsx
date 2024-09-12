@@ -16,7 +16,7 @@ export default function MapTable( { tableType }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/${tableType}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/beatmaps/${tableType}`, {
                     params: { pageNo, dbv: dbv }
                 });
                 const newRows = response.data;
@@ -45,7 +45,7 @@ export default function MapTable( { tableType }) {
                     setalertMsg("Error fetching data. Try disabling adblocker and try again")
                 }
                 else{
-                    setalertMsg("Error fetching data")
+                    setalertMsg("Server under maintenance. Please try again later")
                 }
             }
         };
@@ -82,7 +82,16 @@ export default function MapTable( { tableType }) {
 
     return (
         <div className="flex flex-col mt-1">
-            {rows.map((row, index) => row ? <MapItem key={index} tabletype={tableType} mapId={row.BEATMAP_ID} mapName={row.t} mapArtist={row.a} mapper={row.m} mapCount={row.pick_count} imageUrl={`https://assets.ppy.sh/beatmaps/${row.BEATMAP_ID}/covers/slimcover.jpg`}/> : <SkeletonItem key={index} type="popular"/>)}
+            {rows.map((row, index) => 
+                row ? <MapItem 
+                    key={index} 
+                    tabletype={tableType} 
+                    mapId={row.BEATMAP_ID} 
+                    mapName={row.t} 
+                    mapArtist={row.a} 
+                    mapper={row.m} 
+                    mapCount={row.pick_count} /> : 
+                <SkeletonItem key={index} type="popular"/>)}
             <div id={`${tableType}-sentinel`} className="h-1"></div>
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}
         </div>

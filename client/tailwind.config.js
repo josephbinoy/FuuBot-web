@@ -27,6 +27,9 @@ export default withMT({
       fontFamily: {
         visby: ['VisbyRoundCF','Helvetica','sans-serif'],
       },
+      borderRadius: {
+        'reg': '0.25rem', 
+      },
     },
   },
   plugins: [require('tailwind-scrollbar')]});
