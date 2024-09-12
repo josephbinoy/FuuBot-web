@@ -159,9 +159,10 @@ export async function hydrateRedis(redisClient, rows){
     const playerBuffer = [];
     const apiLimit = 45;
     for (const playerId of newPlayerIds) {
-        if (!(await redisClient.exists(`osuplayer:${playerId}`))) {
-            playerBuffer.push(playerId);
-        }
+        // if (!(await redisClient.exists(`osuplayer:${playerId}`))) {
+        //     if(playerId!=0)
+                playerBuffer.push(playerId);
+        // }
         if (playerBuffer.length === apiLimit) {
             try {
                 const players = await fetchPlayerNames(playerBuffer, bearerToken);
@@ -233,7 +234,7 @@ export async function hydrateRedisFromBackup(redisClient){
         const row = rows[i];
         const beatmapId = Number(row.BEATMAP_ID);
         try {
-            // if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
+            if (!(await redisClient.exists(`osubeatmap:${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
                 if (!metadata){
                     redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
@@ -250,7 +251,7 @@ export async function hydrateRedisFromBackup(redisClient){
                     s: metadata.s,
                     sdate: metadata.sdate
                 });
-            // }
+            }
         } catch (error) {
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
         }
@@ -274,10 +275,10 @@ export async function hydrateRedisFromBackup(redisClient){
     const apiLimit = 45;
     for (let i = 0; i < totalRows; i++) {
         const pickerId = Number(rows[i].PICKER_ID);
-        if (!(await redisClient.exists(`osuplayer:${pickerId}`))) {
-            if (pickerId!=0)
+        // if (!(await redisClient.exists(`osuplayer:${pickerId}`))) {
+        //     if (pickerId!=0)
                 playerBuffer.push(pickerId);
-        }
+        // }
         if (playerBuffer.length === apiLimit) {
             try {
                 const players = await fetchPlayerNames(playerBuffer, bearerToken);
