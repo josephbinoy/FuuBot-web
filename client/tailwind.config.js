@@ -30,6 +30,9 @@ export default withMT({
       borderRadius: {
         'reg': '0.25rem', 
       },
+      boxShadow: {
+        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.4)',
+      },
     },
   },
   plugins: [require('tailwind-scrollbar')]});

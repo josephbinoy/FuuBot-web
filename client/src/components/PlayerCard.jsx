@@ -1,11 +1,10 @@
 import { timeAgo } from '../utils/time';
 import ReactCountryFlag from "react-country-flag"
-import { HeartIcon } from '@heroicons/react/24/solid';
 
 export default function PlayerCard({name, id, country, coverUrl, pickDate}) {   
     return (
       <a href={`https://osu.ppy.sh/users/${id}`}>
-      <div className="flex items-center justify-between rounded-lg relative p-2 px-3 bg-cover bg-center overflow-hidden h-14 text-white shadow-osuslate-200 shadow-lg"
+      <div className="flex items-center justify-between rounded-lg relative p-2 px-3 bg-cover bg-center overflow-hidden h-14 text-white shadow-sm hover:opacity-80 transition-all transform duration-300 hover:-translate-y-px hover:shadow-lg"
         style={{
             backgroundImage: `url(${coverUrl}`,
         }}>

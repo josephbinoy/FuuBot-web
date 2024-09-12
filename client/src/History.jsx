@@ -69,15 +69,18 @@ export default function History() {
         </div>
         <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10">
             {data.map((row, index) => 
-                row ? 
-                <PlayerCard 
-                    key={index} 
-                    id={row.id} 
-                    name={row.n} 
-                    country={row.con} 
-                    pickDate={row.pickDate} 
-                    coverUrl={row.cv} 
-                />:
+                row ? <div className="flex items-center justify-between gap-4">
+                <p className="text-2xl text-gray-300">{index+1}</p>
+                <div className="flex-grow">
+                    <PlayerCard 
+                        key={index} 
+                        id={row.id} 
+                        name={row.n} 
+                        country={row.con} 
+                        pickDate={row.pickDate} 
+                        coverUrl={row.cv} 
+                    />
+                </div></div>:
                 <SkeletonPlayerCard key={index} />
             )}
         </div>

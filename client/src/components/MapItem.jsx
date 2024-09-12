@@ -13,7 +13,7 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, mapCount=0, 
     return (
       <Link to={`history/${mapId}`} className="mx-auto max-w-screen-xl w-11/12 my-2">
         <div
-          className={`relative flex items-center justify-between h-20 rounded-lg px-6 font-visby font-bold text-2xl text-opacity-80 shadow-osuslate-200/50 shadow-lg text-white border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 hover:opacity-80 overflow-hidden`}>
+          className={`relative flex items-center justify-between h-20 rounded-lg px-6 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-white border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
             <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-105"
                 style={{
