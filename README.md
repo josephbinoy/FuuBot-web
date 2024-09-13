@@ -1,7 +1,5 @@
 # FuuBot-web: Official FuuBot Website
 
-# Current Pages
-
 ## Beatmaps
 
 Displays most popular beatmaps of the week, month, year and all time
