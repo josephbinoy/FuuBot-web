@@ -10,7 +10,7 @@ import { timeAgo } from "../utils/time";
 export default function Jumbo({currentTable, setcurrentTable}) {
     const { setDbv } = useDbv();
     const { setalertMsg } = useAlert();
-    const [lastUpdate, setLastUpdate] = useState(0);
+    const [lastUpdate, setLastUpdate] = useState(null);
     useEffect(() => {
         const fetchData = async () => {
             try {
