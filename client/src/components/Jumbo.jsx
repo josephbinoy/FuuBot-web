@@ -33,7 +33,7 @@ export default function Jumbo({currentTable, setcurrentTable}) {
     return (
         <div className=" relative mx-auto max-w-screen-xl flex items-center justify-between h-40">
             <h1 className="text-5xl text-osuslate-50 font-black px-10">Popular Beatmaps</h1>
-            <p className="fixed bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80 z-20">{lastUpdate && `Last updated ${lastUpdate}`}</p>
+            {lastUpdate && <p className="fixed bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80 z-20">{`Last updated ${lastUpdate}`}</p>}
             <ButtonGroup fullWidth ripple={false} size="lg" color="blue-gray">
                 <Button onClick={() => setcurrentTable('weekly')}>
                     <p className={`${currentTable === 'weekly' && 'text-white -translate-y-px'}`}>weekly</p>

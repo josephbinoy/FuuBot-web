@@ -16,7 +16,7 @@ export default function PlayerCard({name, id, country, coverUrl, pickDate}) {
                 svg
                 className='rounded-md text-3xl'
             />
-            <p className='text-xl'>{name}</p>
+            <p className='text-xl'>{id==0 ? 'Deleted User' : name}</p>
         </div>
             <p className='text-sm opacity-80 px-2'>{pickDate && `Picked ${timeAgo(pickDate)}`}</p>
         </div>
