@@ -1,13 +1,13 @@
 import CustomNavbar from "./components/CustomNavbar"
 import MapCard from "./components/MapCard";
 import PlayerCard from "./components/PlayerCard";
-import SkeletonPlayerCard from "./components/SkeletonPlayerCard";
+import SkeletonPlayerCard from "./skeletons/SkeletonPlayerCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { Alert } from "@material-tailwind/react";
-import SkeletonMapCard from "./components/SkeletonMapCard";
+import SkeletonMapCard from "./skeletons/SkeletonMapCard";
 
 export default function History() {
     const [data, setData] = useState([null, null, null, null, null]);
@@ -38,7 +38,7 @@ export default function History() {
         fetchData();
     }, []);
   return(
-    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
+    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
         <CustomNavbar />
         <div className="relative bg-cover bg-center pb-48 pt-10" style={{
             backgroundImage: `url(https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg)`
@@ -69,11 +69,10 @@ export default function History() {
         </div>
         <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
             {data.map((row, index) => 
-                row ? <div className="flex items-center justify-between gap-1">
+                row ? <div className="flex items-center justify-between gap-1" key={index}>
                 <p className="text-2xl text-gray-300 w-10 text-center">{index+1}</p>
                 <div className="flex-grow">
                     <PlayerCard 
-                        key={index} 
                         id={row.id} 
                         name={row.n} 
                         country={row.con} 

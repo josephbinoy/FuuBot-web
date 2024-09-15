@@ -7,8 +7,9 @@ import History from "./History";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
-import { DbvProvider } from "./context/DbvProvider";
 import { AlertProvider } from "./context/AlertProvider";
+import { DbvProvider } from "./context/DbvProvider";
+import { TableProvider } from "./context/TableProvider";
 
 const theme = {
   navbar: {
@@ -95,6 +96,21 @@ const theme = {
       },
     },
   },
+  tooltip: {
+    styles: {
+      base: {
+        bg: "bg-osuslate-200",
+        py: "py-3",
+        px: "px-3",
+        borderRadius: "rounded-lg",
+        fontFamily: "font-visby",
+        fontSize: "text-sm",
+        fontWeight: "font-bold",
+        color: "text-osuslate-50",
+        zIndex: "z-[999]",
+      },
+    },
+  },
 };
 
 const router = createBrowserRouter([
@@ -115,7 +131,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider value={theme}>
       <AlertProvider>
         <DbvProvider>
-          <RouterProvider router={router} />
+          <TableProvider>
+            <RouterProvider router={router} />
+          </TableProvider>
         </DbvProvider>
       </AlertProvider>
     </ThemeProvider>

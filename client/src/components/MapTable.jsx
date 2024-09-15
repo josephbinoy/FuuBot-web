@@ -1,10 +1,9 @@
 import MapItem from "./MapItem";
-import { SkeletonItem } from "./SkeletonItem";
+import SkeletonItem from "../skeletons/SkeletonItem";
 import axios from 'axios';
 import { useDbv } from "../context/DbvProvider";
 import { useEffect, useState, useRef } from 'react';
 import { useAlert } from "../context/AlertProvider";
-
 
 export default function MapTable( { tableType }) {
     const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);

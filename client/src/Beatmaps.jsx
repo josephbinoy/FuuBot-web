@@ -1,17 +1,17 @@
+import { useTable } from "./context/TableProvider";
 import CustomNavbar from "./components/CustomNavbar"
 import Jumbo from "./components/Jumbo"
 import MapTable from "./components/MapTable"
-import { useState } from "react"
 import { Alert } from "@material-tailwind/react";
 import { useAlert } from "./context/AlertProvider";
 
 export default function Beatmaps() {
-  const [currentTable, setcurrentTable] = useState('weekly');
+  const { currentTable } = useTable();
   const { alertMsg, setalertMsg } = useAlert();
   return(
-    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
+    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
       <CustomNavbar />
-      <Jumbo currentTable = {currentTable} setcurrentTable = {setcurrentTable} />
+      <Jumbo />
       <div style={{ display: currentTable === 'weekly' ? 'block' : 'none' }}>
         <MapTable tableType='weekly'/>
       </div>

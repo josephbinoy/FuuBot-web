@@ -1,4 +1,4 @@
-export function SkeletonItem({type}) {
+export default function SkeletonItem({type}) {
   return (
     <div className="animate-pulse h-20 my-2">
         <div className="h-full w-11/12 rounded-lg bg-osuslate-100 opacity-30 flex items-center justify-between mx-auto max-w-screen-xl text-2xl px-6 border-r-4 border-gray-300">

@@ -1,39 +1,17 @@
 import { ButtonGroup, Button } from "@material-tailwind/react";
-import { useDbv } from "../context/DbvProvider.jsx";
-import axios from 'axios';
-import { useEffect, useState } from "react";
-import { useAlert } from "../context/AlertProvider.jsx";
+import { useTable } from "../context/TableProvider.jsx";
 import { Link } from "react-router-dom";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { timeAgo } from "../utils/time";
+import Tooltip from "./ToolTip.jsx";
 
-export default function Jumbo({currentTable, setcurrentTable}) {
-    const { setDbv } = useDbv();
-    const { setalertMsg } = useAlert();
-    const [lastUpdate, setLastUpdate] = useState(null);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/dbv`);
-                setDbv(response.data.dbv);
-                const updateLastUpdate = () => {
-                    setLastUpdate(timeAgo(response.data.dbv)); //stale closure is okay :)
-                };
-                updateLastUpdate();
-                const displayInterval = setInterval(updateLastUpdate, 60000);
-
-                return () => clearInterval(displayInterval);
-            } catch (error) {
-                console.log('Error fetching stats:', error);
-                setalertMsg("Error fetching data. Try disabling adblocker and try again")
-            }
-        };
-        fetchData();
-    }, []);
+export default function Jumbo() {
+    const { currentTable, setcurrentTable } = useTable();
     return (
         <div className=" relative mx-auto max-w-screen-xl flex items-center justify-between h-40">
-            <h1 className="text-5xl text-osuslate-50 font-black px-10">Popular Beatmaps</h1>
-            {lastUpdate && <p className="fixed bottom-1 right-2 text-osuslate-100 text-sm font-bold opacity-80 z-20">{`Last updated ${lastUpdate}`}</p>}
+            <div className="flex items-end justify-center px-10 gap-2">
+                <h1 className="text-5xl text-gray-300 font-black">Popular<br />Beatmaps</h1>
+                <Tooltip/>
+            </div>
             <ButtonGroup fullWidth ripple={false} size="lg" color="blue-gray">
                 <Button onClick={() => setcurrentTable('weekly')}>
                     <p className={`${currentTable === 'weekly' && 'text-white -translate-y-px'}`}>weekly</p>
