@@ -1,5 +1,5 @@
 import { Tooltip } from "@material-tailwind/react";
-import { QuestionMarkCircleIcon, EqualsIcon } from "@heroicons/react/24/outline";
+import { QuestionMarkCircleIcon, EqualsIcon } from "@heroicons/react/16/solid";
  
 export default function ToolTip() {
   return (
@@ -14,7 +14,7 @@ export default function ToolTip() {
         </div>
       }
     >
-    <QuestionMarkCircleIcon className="h-7 w-7 text-osuslate-100 pb-1" />
+    <QuestionMarkCircleIcon className="h-8 w-8 text-gray-300 pb-1"/>
     </Tooltip>
   );
 }

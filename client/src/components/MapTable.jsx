@@ -37,6 +37,10 @@ export default function MapTable( { tableType }) {
                 }
                 setRows(prevRows => prevRows.filter(row => row !== null));
                 console.log('Error fetching data:', error);
+                if(!error.response){
+                    setalertMsg("Server under maintenance. Please try again later")
+                    return;
+                }
                 if(error.response.data.error==='dbv mismatch'){
                     setalertMsg("Database updated! Refresh the page for fresh data")
                 }
@@ -44,7 +48,7 @@ export default function MapTable( { tableType }) {
                     setalertMsg("Error fetching data. Try disabling adblocker and try again")
                 }
                 else{
-                    setalertMsg("Server under maintenance. Please try again later")
+                    setalertMsg("Error fetching data")
                 }
             }
         };

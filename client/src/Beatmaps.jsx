@@ -2,12 +2,9 @@ import { useTable } from "./context/TableProvider";
 import CustomNavbar from "./components/CustomNavbar"
 import Jumbo from "./components/Jumbo"
 import MapTable from "./components/MapTable"
-import { Alert } from "@material-tailwind/react";
-import { useAlert } from "./context/AlertProvider";
 
 export default function Beatmaps() {
   const { currentTable } = useTable();
-  const { alertMsg, setalertMsg } = useAlert();
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
       <CustomNavbar />
@@ -24,17 +21,6 @@ export default function Beatmaps() {
       <div style={{ display: currentTable === 'alltime' ? 'block' : 'none' }}>
         <MapTable tableType='alltime'/>
       </div>
-      <Alert
-        className="absolute bottom-3 left-3"
-        open={alertMsg !== ""}
-        color="blue-gray"
-        onClose={() => setalertMsg("")}
-        animate={{
-        mount: { y: 0 },
-        unmount: { y: -20 },
-      }}>
-        {alertMsg}
-      </Alert>
     </div>
   );
 }

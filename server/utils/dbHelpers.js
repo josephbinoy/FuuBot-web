@@ -1,23 +1,12 @@
 import Database from "better-sqlite3"
 import { sqliteLogger } from "./Logger.js";
 
-export function getFuuBotClient(){
-    let fuubotDbClient;
-    try {
-        fuubotDbClient = new Database(process.env.FUUBOT_DB_PATH, { 
+export async function backupFuuBotDb(){
+    try{
+        const fuuClient = new Database(process.env.FUUBOT_DB_PATH, { 
             readonly: true,
             fileMustExist: true
         })
-        sqliteLogger.info('Successfully connected to FuuBot DB');
-        
-    } catch (error) {
-        sqliteLogger.error("Error connecting to FuuBot DB", error)
-    }
-    return fuubotDbClient;
-}
-
-export async function backupFuuBotDb(fuuClient){
-    try{
         await fuuClient.backup(process.env.BACKUP_DB_PATH);
         sqliteLogger.info('Successfully backed up FuuBot DB');
 
@@ -64,24 +53,11 @@ export function vacuumBackup(){
     backupClient.close();
 }
 
-export function getNewRows(fuuClient, lastUpdateTimestamp){
-    try{
-        const newRows = fuuClient.prepare(`
-            SELECT * FROM PICKS
-            WHERE PICK_DATE > ${lastUpdateTimestamp};
-        `).all();
-        sqliteLogger.info(`Found ${newRows.length} new rows in FuuBot DB`);
-        return newRows;
-    } catch (error) {
-        sqliteLogger.error("Error fetchng new rows from FuuBot DB", error);
-    }
-}
-
 export function updateMemoryDb(memClient, newRows){
     try{
         const insert = memClient.prepare(`
             INSERT INTO PICKS (BEATMAP_ID, PICKER_ID, PICK_DATE) 
-            VALUES (@BEATMAP_ID, @PICKER_ID, @PICK_DATE)
+            VALUES (@beatmapId, @pickerId, @pickDate)
             ON CONFLICT(BEATMAP_ID, PICKER_ID) DO UPDATE SET PICK_DATE = excluded.PICK_DATE;
         `);
         for (const row of newRows) {

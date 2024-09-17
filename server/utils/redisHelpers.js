@@ -38,7 +38,7 @@ export async function getRedisMetaClient() {
 }
 
 
-async function getGuestToken() {
+export async function getGuestToken() {
     try {
         const response = await axios.post('https://osu.ppy.sh/oauth/token', {
             grant_type: 'client_credentials',
@@ -121,15 +121,14 @@ export async function fetchBeatmapsetMetadata(beatmapsetId, bearerToken) {
       }
 }
 
-export async function hydrateRedis(redisClient, rows){
-    const bearerToken = await getGuestToken();
+export async function hydrateRedis(redisClient, bearerToken, rows){
     if (!bearerToken) return;
-    redisLogger.info('Hydrating Redis with beatmap metadata from new rows/blacklist...');
+    redisLogger.info('Hydrating Redis with beatmap metadata from new rows...');
     const newPlayerIds = new Set();
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        const beatmapId = Number(row.BEATMAP_ID);
-        const pickerId = Number(row.PICKER_ID);
+        const beatmapId = Number(row.beatmapId);
+        const pickerId = Number(row.pickerId);
         if (pickerId!=0)
             newPlayerIds.add(pickerId);
         try {
@@ -207,11 +206,40 @@ export async function hydrateRedis(redisClient, rows){
             redisLogger.error(`Error hydrating remaining players: ${error.message}`);
         }
     }
-    redisLogger.info('Hydration complete');
 }
 
-export async function hydrateRedisFromBackup(redisClient){
-    const bearerToken = await getGuestToken();
+export async function hydrateRedisFromBlacklist(redisClient, bearerToken,  rows){
+    if (!bearerToken) return;
+    redisLogger.info('Hydrating Redis with beatmap metadata from blacklist...');
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const beatmapId = Number(row.beatmapId);
+        try {
+            if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
+                const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
+                if (!metadata){
+                    redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
+                    continue;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                await redisClient.hSet(`fuubot:beatmap-${beatmapId}`, {
+                    t: metadata.t,
+                    a: metadata.a,
+                    m: metadata.m,
+                    mid: metadata.mid,
+                    fc: metadata.fc,
+                    pc: metadata.pc,
+                    s: metadata.s,
+                    sdate: metadata.sdate
+                });
+            }
+        } catch (error) {
+            redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
+        }
+    }
+}
+
+export async function hydrateRedisFromBackup(redisClient, bearerToken){
     if (!bearerToken) return;
     const db = new Database(process.env.BACKUP_DB_PATH, { 
         readonly: true,

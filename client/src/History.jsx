@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { Alert } from "@material-tailwind/react";
 import SkeletonMapCard from "./skeletons/SkeletonMapCard";
+import { useAlert } from "./context/AlertProvider";
 
 export default function History() {
     const [data, setData] = useState([null, null, null, null, null]);
-    const [alertMsg, setalertMsg] = useState("");
+    const { setalertMsg } = useAlert();
     const [map, setMap] = useState({});
     const id = useParams().beatmapId;
     useEffect(() => {
@@ -48,7 +48,7 @@ export default function History() {
             }}/>
             <div className="absolute inset-0 filter backdrop-blur-lg xl:backdrop-blur-xl" />
             <div className="relative mx-auto max-w-screen-xl flex items-center justify-between h-32 ">
-                <Link to="/" className="absolute -top-6 text-lg text-osuslate-100 font-extrabold flex items-center opacity-70">
+                <Link to="/" className="absolute -top-6 text-lg text-osuslate-100 font-bold flex items-center opacity-70">
                     <ChevronLeftIcon className="opacity-80 h-5 w-5 mr-1" strokeWidth={3} />Back
                 </Link>
                 <h1 className="text-5xl text-gray-300 font-black px-10 mb-5">Beatmap History</h1>
@@ -83,17 +83,6 @@ export default function History() {
                 <SkeletonPlayerCard key={index} />
             )}
         </div>
-        <Alert
-            className="absolute bottom-3 left-3"
-            open={alertMsg !== ""}
-            color="blue-gray"
-            onClose={() => setalertMsg("")}
-            animate={{
-            mount: { y: 0 },
-            unmount: { y: -20 },
-        }}>
-            {alertMsg}
-        </Alert>
     </div>
   );
 }

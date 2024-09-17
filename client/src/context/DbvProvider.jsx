@@ -22,7 +22,13 @@ export function DbvProvider({ children }) {
             return () => clearInterval(displayInterval);
         } catch (error) {
             console.log('Error fetching stats:', error);
-            setalertMsg("Error fetching data. Try disabling adblocker and try again")
+            if(!error.response){
+                setalertMsg("Server under maintenance. Please try again later")
+                return;
+            }
+            else {
+              setalertMsg("Error fetching data. Try disabling adblocker and try again")
+            }
         }
     };
     fetchData();

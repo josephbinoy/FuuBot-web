@@ -1,44 +1,51 @@
 import express from "express";
 import 'dotenv/config'
-import { getFuuBotClient, getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, getNewRows, updateMemoryDb } from "./utils/dbHelpers.js";
-import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedis, deleteCache } from "./utils/redisHelpers.js";
+import { getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, updateMemoryDb } from "./utils/dbHelpers.js";
+import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedis, hydrateRedisFromBlacklist, deleteCache, getGuestToken } from "./utils/redisHelpers.js";
+import UpdateQueue from "./utils/UpdateQueue.js";
 import { logger } from "./utils/Logger.js";
 import { addCleanupListener, exitAfterCleanup } from "async-cleanup";
 import readline from 'readline';
 import { promises as fs } from 'fs';
 
 const app = express();
+app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
     (async () => {
         const cors = await import('cors');
         app.use(cors.default());
     })();
 }
-const fuuClient = getFuuBotClient();
 const memClient = getMemoryClient();
 const redisMeta = await getRedisMetaClient();
 const redisCache = await getRedisCacheClient();
+const updateQueue = new UpdateQueue();
 let lastUpdateTimestamp = 0;
 let isDeletingCache = false;
 let blacklist = [];
+let bearerToken = '';
 
-async function updateAndHydrate() {
-    const newRows = getNewRows(fuuClient, lastUpdateTimestamp);
+async function updateAndHydrate(newRows) {
     updateMemoryDb(memClient, newRows);
     lastUpdateTimestamp = Math.floor(new Date().getTime() / 1000);
     isDeletingCache = true;
     await deleteCache(redisCache);
     isDeletingCache = false;
+    bearerToken = await getGuestToken();
+    await hydrateRedis(redisMeta, bearerToken, newRows);
+    await updateBlacklist();
+}
+
+async function updateBlacklist(){
     try{
         const temp = await getBlacklist();
         if(temp.length!==blacklist.length){
             blacklist=temp;
-            newRows.push(...blacklist);
+            hydrateRedisFromBlacklist(redisMeta, bearerToken, blacklist);
         }
     } catch (error) {
         logger.error('Error reading blacklist:', error);
     }
-    await hydrateRedis(redisMeta, newRows);
 }
 
 function getQuery(period) {
@@ -84,26 +91,25 @@ async function getBlacklist() {
     const blacklist = data.split('\n')
         .map(line => parseInt(line.trim()))
         .filter(id => !isNaN(id))
-        .map(id => ({ BEATMAP_ID: id }));
+        .map(id => ({ beatmapId: id }));
     return blacklist;
 }
 
 async function main(){
-    await backupFuuBotDb(fuuClient);
+    await backupFuuBotDb();
     lastUpdateTimestamp = Math.floor(new Date().getTime() / 1000);
-    setInterval(updateAndHydrate, 3600000);
     vacuumBackup();
     await deleteCache(redisCache);
-    await hydrateRedisFromBackup(redisMeta);
+    bearerToken = await getGuestToken();
+    await hydrateRedisFromBackup(redisMeta, bearerToken);
     loadFromBackup(memClient);
     memClient.pragma('journal_mode = WAL');
     try{
         blacklist = await getBlacklist();
-        await hydrateRedis(redisMeta, blacklist);
+        await hydrateRedisFromBlacklist(redisMeta, bearerToken, blacklist);
     } catch (error) {
         logger.error('Error reading blacklist:', error);
     }
-
     app.get('/api/dbv', (req, res) => {
         res.json({ dbv: lastUpdateTimestamp });
     });
@@ -169,14 +175,14 @@ async function main(){
             }
             const result = [];
             for (const row of blacklist) {
-                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
+                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.beatmapId}`);
                 if (meta) {
                     result.push({ ...row, ...meta });
                 }
             }
             if (!isDeletingCache) {
                 await redisCache.set(cacheKey, JSON.stringify(result));
-            }        
+            }
             res.json(result);
         } catch (error) {
             logger.error('Error fetching data:', error);
@@ -230,6 +236,36 @@ async function main(){
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
+
+    app.post('/api/update', async (req, res, next) => {
+        const allowedHosts = ['127.0.0.1', '::1', 'localhost'];
+        const requestHost = req.hostname;
+
+        if (!requestHost) {
+            return res.status(400).send('Bad Request');
+        }
+        
+        if (!allowedHosts.includes(requestHost)) {
+            return res.status(403).send('Forbidden');
+        }
+        next();
+        }, async (req, res) => {
+            try{
+                const newRows = req.body.picks;
+                if (!newRows || !Array.isArray(newRows) || newRows.length === 0) {
+                    res.status(400).json({ error: 'Invalid parameters' });
+                    return;
+                }
+                updateQueue.addToQueue(async () => {
+                    logger.info(`Received ${newRows.length} new rows`);
+                    await updateAndHydrate(newRows);
+                });
+                res.status(200).json({ message: 'received' });
+            } catch (error) {
+                logger.error('Error updating with new rows:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        });
     
     app.listen(process.env.PORT, () => {
         logger.info(`Server running on port ${process.env.PORT}!`);
@@ -242,11 +278,6 @@ addCleanupListener(async () => {
     if (memClient) {
         memClient.close();
         logger.info('Memory database connection closed.');
-    }
-
-    if (fuuClient) {
-        fuuClient.close();
-        logger.info('FuuBot database connection closed.');
     }
 
     if (redisCache) {

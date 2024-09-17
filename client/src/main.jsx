@@ -105,7 +105,7 @@ const theme = {
         borderRadius: "rounded-lg",
         fontFamily: "font-visby",
         fontSize: "text-sm",
-        fontWeight: "font-bold",
+        fontWeight: "font-semibold",
         color: "text-osuslate-50",
         zIndex: "z-[999]",
       },

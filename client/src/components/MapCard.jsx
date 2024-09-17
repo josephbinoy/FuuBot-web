@@ -28,8 +28,8 @@ export default function MapCard({mapId, mapName, mapArtist, mapper, mapperId, fa
             <div className="flex gap-2">
                 <img src={`https://a.ppy.sh/${mapperId}`} className="w-12 h-12 rounded-lg opacity-80" />
                 <div className="flex flex-col justify-center">                
-                    <h3 className="text-sm text-gray-300">Mapped by {mapper}</h3>
-                    <p className="text-xs text-gray-400">Submitted {date}</p>
+                    <h3 className="font-bold text-sm text-gray-300">Mapped by {mapper}</h3>
+                    <p className="font-bold text-xs text-gray-400">Submitted {date}</p>
                 </div>
             </div>
         </div>
