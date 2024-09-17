@@ -8,8 +8,8 @@ export async function backupFuuBotDb(){
             fileMustExist: true
         })
         await fuuClient.backup(process.env.BACKUP_DB_PATH);
+        fuuClient.close();
         sqliteLogger.info('Successfully backed up FuuBot DB');
-
     } catch (error) {
         sqliteLogger.error("Error backing up FuuBot DB", error);
     }
