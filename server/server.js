@@ -48,10 +48,10 @@ async function updateBlacklist(){
     }
 }
 
-function getQuery(period) {
+function getBeatmapQuery(period) {
     switch (period) {
         case 'weekly':
-            return `SELECT BEATMAP_ID, COUNT(BEATMAP_ID) as pick_count 
+            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
             FROM PICKS 
             WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400) 
             GROUP BY BEATMAP_ID 
@@ -59,7 +59,7 @@ function getQuery(period) {
             LIMIT (?) 
             OFFSET (?)`;
         case 'monthly':
-            return `SELECT BEATMAP_ID, COUNT(BEATMAP_ID) as pick_count 
+            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
             FROM PICKS 
             WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400) 
             GROUP BY BEATMAP_ID 
@@ -67,7 +67,7 @@ function getQuery(period) {
             LIMIT (?) 
             OFFSET (?)`;
         case 'yearly':
-            return `SELECT BEATMAP_ID, COUNT(BEATMAP_ID) as pick_count 
+            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
             FROM PICKS 
             WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400) 
             GROUP BY BEATMAP_ID 
@@ -75,7 +75,7 @@ function getQuery(period) {
             LIMIT (?) 
             OFFSET (?)`;
         case 'alltime':
-            return `SELECT BEATMAP_ID, COUNT(BEATMAP_ID) as pick_count 
+            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
             FROM PICKS 
             GROUP BY BEATMAP_ID 
             ORDER BY pick_count DESC 
@@ -84,6 +84,19 @@ function getQuery(period) {
         default:
             return null;
     }
+}
+
+function getLeaderboardQuery(period) {
+    const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
+    
+    return `
+        SELECT PICKER_ID, 
+            COUNT(*) as alltime_pick_count,
+            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_pick_count
+        FROM PICKS 
+        GROUP BY PICKER_ID 
+        ORDER BY ${sortColumn} DESC 
+        LIMIT 51`;
 }
 
 async function getBlacklist() {
@@ -145,9 +158,7 @@ async function main(){
             }
             for (const row of rows) {
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
-                if (player) {
-                    history.push({ id: row.PICKER_ID, ...player, pickDate: row.PICK_DATE });
-                }
+                history.push({ id: row.PICKER_ID, ...player, pickDate: row.PICK_DATE });
             }
             const result = { 
                 beatmap: meta, 
@@ -176,7 +187,7 @@ async function main(){
             const result = [];
             for (const row of blacklist) {
                 const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.beatmapId}`);
-                if (meta) {
+                if (meta.t) {
                     result.push({ ...row, ...meta });
                 }
             }
@@ -192,7 +203,7 @@ async function main(){
 
     app.get('/api/beatmaps/:period', async (req, res) => {
         const { period } = req.params;
-        let pageNo = parseInt(req.query.pageNo);
+        const pageNo = parseInt(req.query.pageNo);
         const dbv = parseInt(req.query.dbv);
         if (isNaN(dbv) || isNaN(pageNo) || pageNo < 0) {
             res.status(400).json({ error: 'Invalid parameters' });
@@ -206,7 +217,7 @@ async function main(){
             res.status(409).json({ error: 'dbv mismatch' });
             return;
         }
-        const cacheKey = `fuubot:cache-${period}-${pageNo}`;   
+        const cacheKey = `fuubot:cache-beatmap-${period}-${pageNo}`;   
         try {
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
@@ -215,7 +226,7 @@ async function main(){
                     return;
                 }
             }
-            const query = getQuery(period);
+            const query = getBeatmapQuery(period);
             if (!query) {
                 return;
             }
@@ -223,7 +234,7 @@ async function main(){
             const result = [];
             for (const row of rows) {
                 const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
-                if (meta) {
+                if (meta.t) {
                     result.push({ ...row, ...meta });
                 }
             }
@@ -266,6 +277,42 @@ async function main(){
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
+
+    app.get('/api/leaderboard/:period', async (req, res) => {
+        const { period } = req.params;
+        const cacheKey = `fuubot:cache-leaderboard-${period}`;   
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {                  
+                    res.json(JSON.parse(cachedResult));
+                    return;
+                }
+            }
+            const query = getLeaderboardQuery(period);
+            const rows = memClient.prepare(query).all();
+            const result = [];
+            for (const row of rows) {
+                const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
+                if (player.n) {
+                    result.push({
+                        id: row.PICKER_ID,
+                        name: player.n,
+                        country: player.con,
+                        alltimeCount: row.alltime_pick_count, 
+                        weeklyCount: row.weekly_pick_count
+                    });
+                }
+            }
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }            
+            res.json(result);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
     
     app.listen(process.env.PORT, () => {
         logger.info(`Server running on port ${process.env.PORT}!`);

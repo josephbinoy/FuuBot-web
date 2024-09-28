@@ -4,6 +4,7 @@ import { createBrowserRouter,  RouterProvider } from "react-router-dom";
 import Beatmaps from "./Beatmaps";
 import Blacklist from "./Blacklist";
 import History from "./History";
+import Players from "./Players";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
@@ -29,6 +30,7 @@ const theme = {
       colors: {
         "blue-gray": {
           gradient: "bg-gradient-to-tr from-glow-300 via-glow-200 to-glow-300",
+          color: "text-gray-300 font-visby text-lg",
         },
       },
     },
@@ -125,6 +127,10 @@ const router = createBrowserRouter([
   {
     path: "history/:beatmapId",
     element: (<History />),
+  },
+  {
+    path: "players",
+    element: (<Players />),
   }
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(

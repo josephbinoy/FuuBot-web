@@ -3,10 +3,7 @@ import {
   Navbar,
   Collapse,
   Typography,
-  IconButton,
-  Popover,
-  PopoverHandler,
-  PopoverContent
+  IconButton
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, Link } from "react-router-dom";
@@ -23,9 +20,7 @@ function NavList() {
           Beatmaps
         </Typography>
       </NavLink>
-      <Popover placement="bottom" offset={-32} >
-      <PopoverHandler>
-      <NavLink to={"#"}>
+      <NavLink to={"/players"} className={({ isActive }) => isActive ? 'text-osuslate-50 scale-105' : ''}>
         <Typography
           as="li"
           variant="h4"
@@ -34,15 +29,6 @@ function NavList() {
           Players
         </Typography>
       </NavLink>
-      </PopoverHandler>
-      <PopoverContent className="z-[999] overflow-hidden p-0"> 
-          <div className="h-28 w-28">
-            <img
-              src="https://media1.tenor.com/m/lYbTKdA7da4AAAAC/40hara-kinako.gif"
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
     </ul>
   );
 }

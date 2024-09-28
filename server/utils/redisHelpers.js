@@ -129,8 +129,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
         const row = rows[i];
         const beatmapId = Number(row.beatmapId);
         const pickerId = Number(row.pickerId);
-        if (pickerId!=0)
-            newPlayerIds.add(pickerId);
+        newPlayerIds.add(pickerId);
         try {
             if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
@@ -158,8 +157,8 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
     const playerBuffer = [];
     const apiLimit = 45;
     for (const playerId of newPlayerIds) {
-        if (!(await redisClient.exists(`fuubot:player-${playerId}`))) {
-            if(playerId!=0)
+        if(playerId != 0) {
+            if (!(await redisClient.exists(`fuubot:player-${playerId}`)))
                 playerBuffer.push(playerId);
         }
         if (playerBuffer.length === apiLimit) {
@@ -303,9 +302,10 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
     const apiLimit = 45;
     for (let i = 0; i < totalRows; i++) {
         const pickerId = Number(rows[i].PICKER_ID);
-        if (!(await redisClient.exists(`fuubot:player-${pickerId}`))) {
-            if (pickerId!=0)
+        if (pickerId != 0) {
+            if (!(await redisClient.exists(`fuubot:player-${pickerId}`))) {
                 playerBuffer.push(pickerId);
+            }
         }
         if (playerBuffer.length === apiLimit) {
             try {
