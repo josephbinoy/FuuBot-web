@@ -94,13 +94,15 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                         {index+1}
                       </Typography>
                       {row.delta && row.delta > 0 ?
-                        <div className="flex items-center justify-center gap-1">
+                        <div className="flex items-center justify-center gap-1 w-7">
                           <CaretUpIcon classes="w-4 h-4 stroke-red-500"/>
                           <p className="text-green-500">{row.delta}</p>
-                        </div> : row.delta < 0 &&
-                        <div className="flex items-center justify-center gap-1">
+                        </div> : row.delta < 0 ?
+                        <div className="flex items-center justify-center gap-1 w-7">
                           <CaretDownIcon classes="w-4 h-4" />
                           <p className="text-red-500">{Math.abs(row.delta)}</p>
+                        </div>:
+                        <div className="w-7">
                         </div>}
                       </div>
                     </td>
