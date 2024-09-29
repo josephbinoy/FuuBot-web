@@ -97,7 +97,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                         <div className="flex items-center justify-center gap-1">
                           <CaretUpIcon classes="w-4 h-4 stroke-red-500"/>
                           <p className="text-green-500">{row.delta}</p>
-                        </div> :
+                        </div> : row.delta < 0 &&
                         <div className="flex items-center justify-center gap-1">
                           <CaretDownIcon classes="w-4 h-4" />
                           <p className="text-red-500">{Math.abs(row.delta)}</p>

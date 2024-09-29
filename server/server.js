@@ -318,7 +318,7 @@ async function main(){
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
                 if (player.n) {
                     const currentRank = i;
-                    const previousRank = yesterdayRows[row.PICKER_ID] || currentRank;
+                    const previousRank = yesterdayRanks[row.PICKER_ID] || currentRank;
                     const rankChange = previousRank - currentRank;
                     result.push({
                         id: row.PICKER_ID,
