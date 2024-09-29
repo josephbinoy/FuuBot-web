@@ -30,7 +30,7 @@ const theme = {
       colors: {
         "blue-gray": {
           gradient: "bg-gradient-to-tr from-glow-300 via-glow-200 to-glow-300",
-          color: "text-gray-300 font-visby text-lg",
+          color: "text-gray-300 font-visby text-lg font-bold",
         },
       },
     },
