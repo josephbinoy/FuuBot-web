@@ -3,7 +3,7 @@ import LeaderBoard from "./components/LeaderBoard";
 import { useState } from "react";
 
 export default function History() {
-  const [currentLeaderboard, setcurrentLeaderboard] = useState('alltime');
+  const [currentLeaderboard, setcurrentLeaderboard] = useState('weekly');
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
         <CustomNavbar />

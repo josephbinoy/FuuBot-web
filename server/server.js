@@ -93,10 +93,25 @@ function getLeaderboardQuery(period) {
         SELECT PICKER_ID, 
             COUNT(*) as alltime_pick_count,
             SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_pick_count
-        FROM PICKS 
+        FROM PICKS
+        WHERE PICKER_ID != 0
         GROUP BY PICKER_ID 
         ORDER BY ${sortColumn} DESC 
-        LIMIT 51`;
+        LIMIT 50`;
+}
+
+function getYesterdayLeaderboardQuery(period) {
+    const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
+    
+    return `
+        SELECT PICKER_ID, 
+            SUM(CASE WHEN PICK_DATE <= (strftime('%s', 'now') - 86400) THEN 1 ELSE 0 END) as alltime_pick_count,
+            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 8 * 86400) AND PICK_DATE <= (strftime('%s', 'now') - 86400) THEN 1 ELSE 0 END) as weekly_pick_count
+        FROM PICKS 
+        WHERE PICKER_ID != 0
+        GROUP BY PICKER_ID 
+        ORDER BY ${sortColumn} DESC 
+        LIMIT 50`;
 }
 
 async function getBlacklist() {
@@ -289,18 +304,29 @@ async function main(){
                     return;
                 }
             }
-            const query = getLeaderboardQuery(period);
-            const rows = memClient.prepare(query).all();
+            const query1 = getLeaderboardQuery(period);
+            const query2 = getYesterdayLeaderboardQuery(period);
+            const todayRows = memClient.prepare(query1).all();
+            const yesterdayRows = memClient.prepare(query2).all();
+            const yesterdayRanks = {};
+            yesterdayRows.forEach((row, index) => {
+                yesterdayRanks[row.PICKER_ID] = index;
+            });
             const result = [];
-            for (const row of rows) {
+            for (let i = 0; i < todayRows.length; i++) {
+                const row = todayRows[i];
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
                 if (player.n) {
+                    const currentRank = i;
+                    const previousRank = yesterdayRows[row.PICKER_ID] || currentRank;
+                    const rankChange = previousRank - currentRank;
                     result.push({
                         id: row.PICKER_ID,
                         name: player.n,
                         country: player.con,
                         alltimeCount: row.alltime_pick_count, 
-                        weeklyCount: row.weekly_pick_count
+                        weeklyCount: row.weekly_pick_count,
+                        delta: rankChange
                     });
                 }
             }

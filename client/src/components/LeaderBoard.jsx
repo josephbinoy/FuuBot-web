@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useAlert } from "../context/AlertProvider";
 import SkeletonRow from "../skeletons/SkeletonRow";
 import ReactCountryFlag from "react-country-flag";
+import CaretDownIcon from "./CaretDownIcon";
+import CaretUpIcon from "./CaretUpIcon";
 import axios from "axios";
   
 export default function LeaderBoard({period, currentLeaderboard, setcurrentLeaderboard}) {
@@ -17,8 +19,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
             const newRows = response.data;
             setRows(prevRows => {
                 const filteredRows = prevRows.filter(row => row !== null);
-                const updatedRows = [...filteredRows, ...newRows];
-                return updatedRows.slice(0, 50);
+                return [...filteredRows, ...newRows];
             });
         } catch (error) {
             console.log('Error fetching data:', error);
@@ -41,7 +42,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
         <table className="w-full min-w-max table-auto text-center">
          <thead className="bg-osuslate-200 z-20">
             <tr className="h-16 border-b border-osuslate-500 bg-osuslate-200">
-            <th className="w-4 p-4 pl-6"
+            <th className="w-4 p-4 pr-8"
                 >
                   <Typography
                     color="blue-gray"
@@ -83,14 +84,25 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => row ? <tr key={index} className={`${index==rows.length-1?'':'border-gray-700/10 border-b'} h-20`}>
+            {rows.map((row, index) => row ? <tr key={index} className={`${index==rows.length-1?'':'border-black/10 border-b'} h-20`}>
                   <td className='p-4'>
+                    <div className="flex items-center justify-end gap-2">
                       <Typography 
                         color="blue-gray"
-                        className="pl-2"
+                        className="pl-2 mr-4"
                       >
                         {index+1}
                       </Typography>
+                      {row.delta && row.delta > 0 ?
+                        <div className="flex items-center justify-center gap-1">
+                          <CaretUpIcon classes="w-4 h-4 stroke-red-500"/>
+                          <p className="text-green-500">{row.delta}</p>
+                        </div> :
+                        <div className="flex items-center justify-center gap-1">
+                          <CaretDownIcon classes="w-4 h-4" />
+                          <p className="text-red-500">{Math.abs(row.delta)}</p>
+                        </div>}
+                      </div>
                     </td>
                     <td className='p-4'>
                       <a className="flex gap-3 items-center justify-start" href={`https://osu.ppy.sh/users/${row.id}`}>
