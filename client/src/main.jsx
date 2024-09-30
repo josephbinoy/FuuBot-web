@@ -101,14 +101,14 @@ const theme = {
   tooltip: {
     styles: {
       base: {
-        bg: "bg-osuslate-200",
+        bg: "bg-osuslate-800",
         py: "py-3",
         px: "px-3",
         borderRadius: "rounded-lg",
         fontFamily: "font-visby",
         fontSize: "text-sm",
         fontWeight: "font-semibold",
-        color: "text-osuslate-50",
+        color: "text-gray-400",
         zIndex: "z-[999]",
       },
     },

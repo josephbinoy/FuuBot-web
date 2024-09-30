@@ -25,3 +25,13 @@ export function timeAgo(timestamp) {
         return `${seconds} seconds ago`;
     }
 }
+
+export function getYesterdayDate() {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+
+    const options = { day: '2-digit', month: 'long', timeZone: 'UTC' };
+    const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(yesterday);
+
+    return formattedDate;
+}

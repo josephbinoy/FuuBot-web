@@ -1,17 +1,18 @@
 import {  ChevronDownIcon } from "@heroicons/react/24/outline";
-import {  Card, Typography, CardBody} from "@material-tailwind/react";
+import {  Card, Typography, CardBody, Tooltip } from "@material-tailwind/react";
 import { useState, useEffect } from "react";
 import { useAlert } from "../context/AlertProvider";
 import SkeletonRow from "../skeletons/SkeletonRow";
 import ReactCountryFlag from "react-country-flag";
 import CaretDownIcon from "./CaretDownIcon";
 import CaretUpIcon from "./CaretUpIcon";
+import { getYesterdayDate } from "../utils/time";
 import axios from "axios";
   
 export default function LeaderBoard({period, currentLeaderboard, setcurrentLeaderboard}) {
   const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
   const { setalertMsg } = useAlert();
-
+  const rankFrameDate = getYesterdayDate();
   useEffect(() => {
     const fetchData = async () => {
         try {
@@ -44,11 +45,17 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
             <tr className="h-16 border-b border-osuslate-500 bg-osuslate-200">
             <th className="w-4 p-4 pr-8"
                 >
+                  <Tooltip
+                    content={
+                      <p>Rank changes are relative to {rankFrameDate}, 00:00 UTC</p>                   
+                    }
+                  >
                   <Typography
                     color="blue-gray"
                   >
                     Rank
                   </Typography>
+                  </Tooltip>
                 </th>
             <th className="flex-grow p-4"
                 >
