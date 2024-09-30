@@ -105,8 +105,8 @@ function getYesterdayLeaderboardQuery(period) {
     
     return `
         SELECT PICKER_ID, 
-            SUM(CASE WHEN PICK_DATE <= (strftime('%s', 'now') - 86400) THEN 1 ELSE 0 END) as alltime_pick_count,
-            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 8 * 86400) AND PICK_DATE <= (strftime('%s', 'now') - 86400) THEN 1 ELSE 0 END) as weekly_pick_count
+            SUM(CASE WHEN PICK_DATE < (strftime('%s', 'now', 'start of day', '-1 day')) THEN 1 ELSE 0 END) as alltime_pick_count,
+            SUM(CASE WHEN PICK_DATE >= (strftime('%s', 'now', 'start of day', '-8 days')) AND PICK_DATE < (strftime('%s', 'now', 'start of day', '-1 day')) THEN 1 ELSE 0 END) as weekly_pick_count
         FROM PICKS 
         WHERE PICKER_ID != 0
         GROUP BY PICKER_ID 
