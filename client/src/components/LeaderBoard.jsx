@@ -43,7 +43,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
         <table className="w-full min-w-max table-auto text-center">
          <thead className="bg-osuslate-200 z-20">
             <tr className="h-16 border-b border-osuslate-500 bg-osuslate-200">
-            <th className="w-4 p-4 pr-8"
+            <th className="w-[130px] py-4"
                 >
                   <Tooltip
                     content={
@@ -96,7 +96,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                     <div className="flex items-center justify-end gap-2">
                       <Typography 
                         color="blue-gray"
-                        className="pl-2 mr-4"
+                        className="px-4"
                       >
                         {index+1}
                       </Typography>

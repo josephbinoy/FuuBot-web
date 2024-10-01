@@ -1,7 +1,7 @@
 export default function SkeletonRow() {
     return (
         <tr className= "animate-pulse h-20 opacity-30 border-b border-gray-700/10">
-            <td className='pl-8'>
+            <td className='pl-10'>
                 <div className="w-8 h-8 bg-gray-300 rounded-md"/>
             </td>
             <td className='p-4'>

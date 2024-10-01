@@ -1,7 +1,7 @@
 import express from "express";
 import 'dotenv/config'
 import { getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, updateMemoryDb } from "./utils/dbHelpers.js";
-import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedis, hydrateRedisFromBlacklist, deleteCache, getGuestToken } from "./utils/redisHelpers.js";
+import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedis, hydrateRedisFromBlacklist, deleteCache, getGuestToken, refreshPlayerData } from "./utils/redisHelpers.js";
 import UpdateQueue from "./utils/UpdateQueue.js";
 import { logger } from "./utils/Logger.js";
 import { addCleanupListener, exitAfterCleanup } from "async-cleanup";
@@ -173,7 +173,13 @@ async function main(){
             }
             for (const row of rows) {
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
-                history.push({ id: row.PICKER_ID, ...player, pickDate: row.PICK_DATE });
+                history.push({ 
+                    id: row.PICKER_ID, 
+                    n: player.n,
+                    con: player.con,
+                    cv: player.cv,
+                    gr: player.gr, 
+                    pickDate: row.PICK_DATE });
             }
             const result = { 
                 beatmap: meta, 
@@ -372,5 +378,8 @@ const rl = readline.createInterface({
 rl.on('line', async (input) => {
     if (input.trim().toLowerCase() === 'close') {
         await exitAfterCleanup(0);
+    }
+    if (input.trim().toLowerCase() === 'refresh') {
+        await refreshPlayerData(redisMeta, memClient);
     }
 });

@@ -75,7 +75,8 @@ export default function History() {
                     <PlayerCard 
                         id={row.id} 
                         name={row.n} 
-                        country={row.con} 
+                        country={row.con}
+                        rank={row.gr}
                         pickDate={row.pickDate} 
                         coverUrl={row.cv} 
                     />

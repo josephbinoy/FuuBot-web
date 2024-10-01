@@ -58,7 +58,7 @@ export async function getGuestToken() {
     }
 }
 
-async function fetchPlayerNames(playerIds, bearerToken) {
+async function fetchPlayerData(playerIds, bearerToken) {
     let result=[];
     try {
         const url = 'https://osu.ppy.sh/api/v2/users?' + playerIds.map(id => `ids[]=${id}`).join('&');
@@ -78,6 +78,12 @@ async function fetchPlayerNames(playerIds, bearerToken) {
                         n: players.users[i].username,
                         cv: players.users[i].cover.url,
                         con: players.users[i].country_code,
+                        sp: players.users[i].is_supporter,
+                        gr: players.users[i].statistics_rulesets.osu.global_rank,
+                        pp: players.users[i].statistics_rulesets.osu.pp,
+                        acc: players.users[i].statistics_rulesets.osu.hit_accuracy,
+                        pc: players.users[i].statistics_rulesets.osu.play_count,
+                        pt: players.users[i].statistics_rulesets.osu.play_time,
                     });
                 }
             }
@@ -163,7 +169,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
         }
         if (playerBuffer.length === apiLimit) {
             try {
-                const players = await fetchPlayerNames(playerBuffer, bearerToken);
+                const players = await fetchPlayerData(playerBuffer, bearerToken);
                 if (!players){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
@@ -175,7 +181,13 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
                     await redisClient.hSet(`fuubot:player-${player.id}`, {
                         n: player.n,
                         cv: player.cv,
-                        con: player.con
+                        con: player.con,
+                        sp: player.sp.toString(),
+                        gr: player.gr.toString(),
+                        pp: player.pp.toString(),
+                        acc: player.acc.toString(),
+                        pc: player.pc.toString(),
+                        pt: player.pt.toString()
                     });
                 }
             } catch (error) {
@@ -186,7 +198,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
     }
     if (playerBuffer.length > 0) {
         try {
-            const players = await fetchPlayerNames(playerBuffer, bearerToken);
+            const players = await fetchPlayerData(playerBuffer, bearerToken);
             if (!players){
                 redisLogger.error(`Error hydrating players: ${players}`);
                 return;
@@ -197,8 +209,14 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
                 if (!player.n) continue;
                 await redisClient.hSet(`fuubot:player-${player.id}`, {
                     n: player.n,
-                    cv: player.cv ,
-                    con: player.con
+                    cv: player.cv,
+                    con: player.con,
+                    sp: player.sp.toString(),
+                    gr: player.gr.toString(),
+                    pp: player.pp.toString(),
+                    acc: player.acc.toString(),
+                    pc: player.pc.toString(),
+                    pt: player.pt.toString()
                 });
             }
         } catch (error) {
@@ -309,7 +327,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
         }
         if (playerBuffer.length === apiLimit) {
             try {
-                const players = await fetchPlayerNames(playerBuffer, bearerToken);
+                const players = await fetchPlayerData(playerBuffer, bearerToken);
                 if (!players){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
@@ -321,7 +339,13 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
                     await redisClient.hSet(`fuubot:player-${player.id}`, {
                         n: player.n,
                         cv: player.cv,
-                        con: player.con
+                        con: player.con,
+                        sp: player.sp.toString(),
+                        gr: player.gr.toString(),
+                        pp: player.pp.toString(),
+                        acc: player.acc.toString(),
+                        pc: player.pc.toString(),
+                        pt: player.pt.toString()
                     });
                 }
             } catch (error) {
@@ -335,7 +359,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
     }
     if (playerBuffer.length > 0) {
         try {
-            const players = await fetchPlayerNames(playerBuffer, bearerToken);
+            const players = await fetchPlayerData(playerBuffer, bearerToken);
             if (!players){
                 redisLogger.error(`Error hydrating players: ${players}`);
                 return;
@@ -347,7 +371,13 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
                 await redisClient.hSet(`fuubot:player-${player.id}`, {
                     n: player.n,
                     cv: player.cv,
-                    con: player.con
+                    con: player.con,
+                    sp: player.sp.toString(),
+                    gr: player.gr.toString(),
+                    pp: player.pp.toString(),
+                    acc: player.acc.toString(),
+                    pc: player.pc.toString(),
+                    pt: player.pt.toString()
                 });
             }
         } catch (error) {
@@ -374,4 +404,93 @@ export async function deleteCache(redisClient) {
     } catch (error) {
         redisLogger.error('Error deleting cache:', error);
     }
+}
+
+
+export async function refreshPlayerData(redisClient, sqlClient){
+    const bearerToken = await getGuestToken();
+    if (!bearerToken) {
+        redisLogger.error('Error fetching guest token');
+        return;
+    }
+    redisLogger.info('Refreshing player data...');
+    let rows = [];
+    try {
+        rows = sqlClient.prepare('SELECT DISTINCT PICKER_ID FROM PICKS;').all();
+        redisLogger.info(`Found ${rows.length} unique players`);
+    } catch (error) {
+        redisLogger.error(`Error fetching player IDs: ${error.message}`);
+        return;
+    }
+
+    const totalRows = rows.length;
+    redisLogger.info('Hydrating Redis with player data...');
+    const playerBuffer = [];
+    const apiLimit = 45;
+    for (let i = 0; i < totalRows; i++) {
+        const pickerId = Number(rows[i].PICKER_ID);
+        if (pickerId != 0) {
+            playerBuffer.push(pickerId);
+        }
+        if (playerBuffer.length === apiLimit) {
+            try {
+                const players = await fetchPlayerData(playerBuffer, bearerToken);
+                if (!players){
+                    redisLogger.error(`Error hydrating players: ${players}`);
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                for (let j = 0; j < players.length; j++) {
+                    const player = players[j];
+                    if (!player.n) continue;
+                    await redisClient.hSet(`fuubot:player-${player.id}`, {
+                        n: player.n,
+                        cv: player.cv,
+                        con: player.con,
+                        sp: player.sp.toString(),
+                        gr: player.gr.toString(),
+                        pp: player.pp.toString(),
+                        acc: player.acc.toString(),
+                        pc: player.pc.toString(),
+                        pt: player.pt.toString()
+                    });
+                }
+            } catch (error) {
+                redisLogger.error(`Error hydrating players: ${error.message}`);
+            }
+            playerBuffer.length = 0;
+        }
+        if (i % Math.ceil(totalRows / 10) === 0) {
+            redisLogger.info(`${Math.floor((i / totalRows) * 100)}% complete...`);
+        }
+    }
+    if (playerBuffer.length > 0) {
+        try {
+            const players = await fetchPlayerData(playerBuffer, bearerToken);
+            if (!players){
+                redisLogger.error(`Error hydrating players: ${players}`);
+                return;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+            for (let j = 0; j < players.length; j++) {
+                const player = players[j];
+                if (!player.n) continue;
+                await redisClient.hSet(`fuubot:player-${player.id}`, {
+                    n: player.n,
+                    cv: player.cv,
+                    con: player.con,
+                    sp: player.sp.toString(),
+                    gr: player.gr.toString(),
+                    pp: player.pp.toString(),
+                    acc: player.acc.toString(),
+                    pc: player.pc.toString(),
+                    pt: player.pt.toString()
+                });
+            }
+        } catch (error) {
+            redisLogger.error(`Error hydrating remaining players: ${error.message}`);
+        }
+    }
+    redisLogger.info('100% complete...');
+    redisLogger.info('Player data refresh complete');
 }
