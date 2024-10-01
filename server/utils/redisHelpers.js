@@ -174,7 +174,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
@@ -332,7 +332,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
@@ -439,7 +439,7 @@ export async function refreshPlayerData(redisClient, sqlClient){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
