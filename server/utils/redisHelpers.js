@@ -161,7 +161,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
     }
     redisLogger.info('Hydrating Redis with player data from new rows...');
     const playerBuffer = [];
-    const apiLimit = 45;
+    const apiLimit = 50;
     for (const playerId of newPlayerIds) {
         if(playerId != 0) {
             if (!(await redisClient.exists(`fuubot:player-${playerId}`)))
@@ -174,7 +174,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
@@ -317,7 +317,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
     totalRows = rows.length;
     redisLogger.info('Hydrating Redis with player data from backup DB...');
     const playerBuffer = [];
-    const apiLimit = 45;
+    const apiLimit = 50;
     for (let i = 0; i < totalRows; i++) {
         const pickerId = Number(rows[i].PICKER_ID);
         if (pickerId != 0) {
@@ -332,7 +332,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
@@ -426,7 +426,7 @@ export async function refreshPlayerData(redisClient, sqlClient){
     const totalRows = rows.length;
     redisLogger.info('Hydrating Redis with player data...');
     const playerBuffer = [];
-    const apiLimit = 45;
+    const apiLimit = 50;
     for (let i = 0; i < totalRows; i++) {
         const pickerId = Number(rows[i].PICKER_ID);
         if (pickerId != 0) {
@@ -439,7 +439,7 @@ export async function refreshPlayerData(redisClient, sqlClient){
                     redisLogger.error(`Error hydrating players: ${players}`);
                     return;
                 }
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 for (let j = 0; j < players.length; j++) {
                     const player = players[j];
                     if (!player.n) continue;
