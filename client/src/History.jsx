@@ -68,11 +68,12 @@ export default function History() {
             />: <SkeletonMapCard />}
             {totalCount &&
             <h1 className="absolute bottom-16 w-full text-3xl mx-auto text-gray-300 font-extrabold text-center">
-                This map has been picked by <span className="text-glow-200 text-4xl opacity-70">{data.length}</span> players <br />this week
-                and <span className="text-glow-200 text-4xl opacity-70">{totalCount}</span> players all time
+                This map has been picked by <span className="text-glow-200 text-4xl opacity-70">{data.length}</span>{ ` player${data.length == 1 ? '' : 's'}` }<br />this week
+                and <span className="text-glow-200 text-4xl opacity-70">{totalCount}</span>{ ` player${totalCount == 1 ? '' : 's'}`} all time
             </h1>}
         </div>
         <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
+            {data.length>0 && <p className="text-osuslate-100 font-bold pl-10">This week</p>}
             {data.map((row, index) => 
                 row ? <div className="flex items-center justify-between gap-1" key={index}>
                 <p className="text-2xl text-gray-300 w-10 text-center">{index+1}</p>

@@ -2,7 +2,13 @@ import log4js from "log4js";
 
 log4js.configure({
     appenders: {
-        console: { type: "console" },
+        console: { 
+            type: "console",
+            layout: {
+                type: "pattern",
+                pattern: "%[[%d{hh:mm:ss.SSS}][%p] %c -%] %m"
+              }
+         },
         file: {
             type: 'multiFile', 
             base: 'logs/', 

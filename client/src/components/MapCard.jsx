@@ -21,8 +21,8 @@ export default function MapCard({mapId, mapName, mapArtist, mapper, mapperId, fa
                 <h1 className="text-4xl truncate font-extrabold">{mapName}</h1>
                 <h2 className="text-lg truncate">{mapArtist}</h2>
                 <div className="flex items-center justify-start">
-                    <PlayCircleIcon height={20} width={20} /><p className= "text-sm ml-1 mr-3">{playCount}</p>
-                    <HeartIcon height={20} width={20} /><p className="text-sm ml-1">{favoriteCount}</p>
+                    <PlayCircleIcon height={20} width={20} /><p className= "text-sm ml-1 mr-3">{Number(playCount).toLocaleString()}</p>
+                    <HeartIcon height={20} width={20} /><p className="text-sm ml-1">{Number(favoriteCount).toLocaleString()}</p>
                 </div>
             </div>
             <div className="flex gap-2">

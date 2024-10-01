@@ -183,11 +183,11 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
                         cv: player.cv,
                         con: player.con,
                         sp: player.sp.toString(),
-                        gr: player.gr.toString(),
-                        pp: player.pp.toString(),
-                        acc: player.acc.toString(),
-                        pc: player.pc.toString(),
-                        pt: player.pt.toString()
+                        gr: player.gr,
+                        pp: player.pp,
+                        acc: player.acc,
+                        pc: player.pc,
+                        pt: player.pt
                     });
                 }
             } catch (error) {
@@ -212,11 +212,11 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
                     cv: player.cv,
                     con: player.con,
                     sp: player.sp.toString(),
-                    gr: player.gr.toString(),
-                    pp: player.pp.toString(),
-                    acc: player.acc.toString(),
-                    pc: player.pc.toString(),
-                    pt: player.pt.toString()
+                    gr: player.gr,
+                    pp: player.pp,
+                    acc: player.acc,
+                    pc: player.pc,
+                    pt: player.pt
                 });
             }
         } catch (error) {
@@ -341,11 +341,11 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
                         cv: player.cv,
                         con: player.con,
                         sp: player.sp.toString(),
-                        gr: player.gr.toString(),
-                        pp: player.pp.toString(),
-                        acc: player.acc.toString(),
-                        pc: player.pc.toString(),
-                        pt: player.pt.toString()
+                        gr: player.gr,
+                        pp: player.pp,
+                        acc: player.acc,
+                        pc: player.pc,
+                        pt: player.pt
                     });
                 }
             } catch (error) {
@@ -373,11 +373,11 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
                     cv: player.cv,
                     con: player.con,
                     sp: player.sp.toString(),
-                    gr: player.gr.toString(),
-                    pp: player.pp.toString(),
-                    acc: player.acc.toString(),
-                    pc: player.pc.toString(),
-                    pt: player.pt.toString()
+                    gr: player.gr,
+                    pp: player.pp,
+                    acc: player.acc,
+                    pc: player.pc,
+                    pt: player.pt
                 });
             }
         } catch (error) {
@@ -448,11 +448,11 @@ export async function refreshPlayerData(redisClient, sqlClient){
                         cv: player.cv,
                         con: player.con,
                         sp: player.sp.toString(),
-                        gr: player.gr.toString(),
-                        pp: player.pp.toString(),
-                        acc: player.acc.toString(),
-                        pc: player.pc.toString(),
-                        pt: player.pt.toString()
+                        gr: player.gr,
+                        pp: player.pp,
+                        acc: player.acc,
+                        pc: player.pc,
+                        pt: player.pt
                     });
                 }
             } catch (error) {
@@ -480,11 +480,11 @@ export async function refreshPlayerData(redisClient, sqlClient){
                     cv: player.cv,
                     con: player.con,
                     sp: player.sp.toString(),
-                    gr: player.gr.toString(),
-                    pp: player.pp.toString(),
-                    acc: player.acc.toString(),
-                    pc: player.pc.toString(),
-                    pt: player.pt.toString()
+                    gr: player.gr,
+                    pp: player.pp,
+                    acc: player.acc,
+                    pc: player.pc,
+                    pt: player.pt
                 });
             }
         } catch (error) {
