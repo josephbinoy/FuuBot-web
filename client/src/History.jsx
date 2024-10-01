@@ -73,7 +73,7 @@ export default function History() {
             </h1>}
         </div>
         <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
-            {data.length>0 && <p className="text-osuslate-100 font-bold pl-10">This week</p>}
+            {data.length>0 && <p className="text-osuslate-100 font-bold pl-12">This week</p>}
             {data.map((row, index) => 
                 row ? <div className="flex items-center justify-between gap-1" key={index}>
                 <p className="text-2xl text-gray-300 w-10 text-center">{index+1}</p>
