@@ -47,8 +47,11 @@ export default function MapTable( { tableType }) {
                 else if(error.response.data.error==='Incompatible page requested'){
                     setalertMsg("Error fetching data. Try disabling adblocker and try again")
                 }
-                else{
-                    setalertMsg("Error fetching data")
+                else if(error.response.status===502){
+                    setalertMsg("Server under maintenance. Please try again later")
+                }
+                else {
+                    setalertMsg("Error fetching data. Please try again later")
                 }
             }
         };
