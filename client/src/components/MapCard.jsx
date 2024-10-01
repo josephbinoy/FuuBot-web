@@ -9,7 +9,7 @@ export default function MapCard({mapId, mapName, mapArtist, mapper, mapperId, fa
 
     
     return (
-      <div className="mx-auto max-w-screen-xl w-11/12 my-2 h-56 flex rounded-lg relative p-5 bg-cover bg-center overflow-hidden shadow-3xl"
+      <div className="mx-auto max-w-screen-xl w-11/12 mb-8 mt-4 h-56 flex rounded-lg relative p-5 bg-cover bg-center overflow-hidden shadow-3xl"
         style={{
             backgroundImage: `url(https://assets.ppy.sh/beatmaps/${mapId}/covers/cover@2x.jpg)`,
         }}>

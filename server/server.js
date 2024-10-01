@@ -157,14 +157,20 @@ async function main(){
                     return;
                 }
             }
-            const query = `
+            const query1 = `
+                SELECT COUNT(*) AS total_count
+                FROM PICKS
+                WHERE BEATMAP_ID = ?
+            `;
+            const countResult = memClient.prepare(query1).get(id);
+            const query2 = `
                 SELECT PICKER_ID, PICK_DATE
                 FROM PICKS 
                 WHERE BEATMAP_ID = ?
                 AND PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
                 ORDER BY PICK_DATE DESC
             `;
-            const rows = memClient.prepare(query).all(id);
+            const rows = memClient.prepare(query2).all(id);
             const history = [];
             const meta = await redisMeta.hGetAll(`fuubot:beatmap-${id}`);
             if (!meta.t) {  
@@ -183,7 +189,8 @@ async function main(){
             }
             const result = { 
                 beatmap: meta, 
-                history: history 
+                history: history,
+                alltimeCount: countResult.total_count
             };
             if (!isDeletingCache) {
                 await redisCache.set(cacheKey, JSON.stringify(result));

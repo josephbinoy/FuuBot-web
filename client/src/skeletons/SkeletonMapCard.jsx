@@ -1,6 +1,6 @@
 export default function SkeletonMapCard() {
     return(
-    <div className="mx-auto max-w-screen-xl w-11/12 my-2 h-56 flex rounded-lg relative p-5 overflow-hidden animate-pulse bg-osuslate-100 opacity-30">
+    <div className="mx-auto max-w-screen-xl w-11/12 mb-8 mt-4 h-56 flex rounded-lg relative p-5 overflow-hidden animate-pulse bg-osuslate-100 opacity-30">
     <div className="absolute top-3 right-3 h-8 w-8 rounded-lg bg-gray-300"/>
     <div className="absolute bottom-3 right-3 h-8 w-8 rounded-lg bg-gray-300" />
     <div className="w-6/12 flex flex-col items-start justify-between">
