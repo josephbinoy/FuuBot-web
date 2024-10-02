@@ -5,6 +5,7 @@ import Beatmaps from "./Beatmaps";
 import Blacklist from "./Blacklist";
 import History from "./History";
 import Players from "./Players";
+import Profile from "./Profile";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
@@ -131,6 +132,10 @@ const router = createBrowserRouter([
   {
     path: "players",
     element: (<Players />),
+  },
+  {
+    path: "profile/:playerId",
+    element: (<Profile />),
   }
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(

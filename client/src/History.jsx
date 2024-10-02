@@ -67,7 +67,7 @@ export default function History() {
                 submittedAt={map.sdate}
             />: <SkeletonMapCard />}
             {totalCount &&
-            <h1 className="absolute bottom-16 w-full text-3xl mx-auto text-gray-300 font-extrabold text-center">
+            <h1 className="absolute bottom-14 w-full text-3xl mx-auto text-gray-300 font-extrabold text-center leading-relaxed">
                 This map has been picked by <span className="text-glow-200 text-4xl opacity-70">{data.length}</span>{ ` player${data.length == 1 ? '' : 's'}` }<br />this week
                 and <span className="text-glow-200 text-4xl opacity-70">{totalCount}</span>{ ` player${totalCount == 1 ? '' : 's'}`} all time
             </h1>}
@@ -81,16 +81,16 @@ export default function History() {
                     <PlayerCard 
                         id={row.id} 
                         name={row.n} 
-                        country={row.con}
+                        country={row.con_c}
                         rank={row.gr}
                         pickDate={row.pickDate} 
                         coverUrl={row.cv} 
                     />
                 </div></div>:
-                <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center justify-between gap-1" key={index}>
                     <p className="text-2xl text-gray-300 min-w-10 text-center" />
                     <div className="flex-grow">
-                        <SkeletonPlayerCard key={index} />
+                        <SkeletonPlayerCard />
                     </div>
                 </div>
                 

@@ -182,7 +182,7 @@ async function main(){
                 history.push({ 
                     id: row.PICKER_ID, 
                     n: player.n,
-                    con: player.con,
+                    con_c: player.con_c,
                     cv: player.cv,
                     gr: player.gr, 
                     pickDate: row.PICK_DATE });
@@ -336,7 +336,7 @@ async function main(){
                     result.push({
                         id: row.PICKER_ID,
                         name: player.n,
-                        country: player.con,
+                        country: player.con_c,
                         alltimeCount: row.alltime_pick_count, 
                         weeklyCount: row.weekly_pick_count,
                         delta: rankChange
@@ -352,7 +352,95 @@ async function main(){
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
-    
+
+    app.get('/api/profile/picks/:id', async (req, res) => {
+        const id = parseInt(req.params.id);
+        const pageNo = parseInt(req.query.pageNo);
+        const dbv = parseInt(req.query.dbv);
+        if (isNaN(dbv) || isNaN(pageNo) || pageNo < 0) {
+            res.status(400).json({ error: 'Invalid parameters' });
+            return;
+        }
+        else if (dbv === -1 && pageNo !== 0) {
+            res.status(409).json({ error: 'Incompatible page requested' });
+            return;
+        }
+        else if (dbv !== -1 && dbv !== lastUpdateTimestamp) {
+            res.status(409).json({ error: 'dbv mismatch' });
+            return;
+        }
+        const cacheKey = `fuubot:cache-picks-${id}-${pageNo}`;   
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {    
+                    res.json(JSON.parse(cachedResult));         
+                    return;
+                }
+            }
+            const query = `
+                SELECT BEATMAP_ID, PICK_DATE 
+                FROM PICKS 
+                WHERE PICKER_ID = ? 
+                ORDER BY PICK_DATE DESC 
+                LIMIT ? 
+                OFFSET ?`
+            const rows = memClient.prepare(query).all(id, 15, pageNo * 15);
+            const result = [];
+            for (const row of rows) {
+                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
+                if (meta.t) {
+                    result.push({ ...row, ...meta });
+                }
+            }
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }        
+            res.json(result);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    app.get('/api/profile/:id', async (req, res) => {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            res.status(400).json({ error: 'Invalid parameters' });
+            return;
+        }
+        const cacheKey = `fuubot:cache-profile-${id}`;   
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {                  
+                    res.json(JSON.parse(cachedResult));
+                    return;
+                }
+            }
+            const query = `
+                SELECT
+                    COUNT(*) as alltime_pick_count,
+                    SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_pick_count
+                FROM PICKS
+                WHERE PICKER_ID = ?`;
+            const row = memClient.prepare(query).get(id);
+            const player = await redisMeta.hGetAll(`fuubot:player-${id}`);
+            const result = {
+                player: player,
+                alltimeCount: row.alltime_pick_count,
+                weeklyCount: row.weekly_pick_count
+            }    
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }        
+            res.json(result);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.listen(process.env.PORT, () => {
         logger.info(`Server running on port ${process.env.PORT}!`);
     });

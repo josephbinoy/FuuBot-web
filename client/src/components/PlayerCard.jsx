@@ -1,9 +1,10 @@
 import { timeAgo } from '../utils/time';
 import ReactCountryFlag from "react-country-flag"
+import { Link } from 'react-router-dom';
 
 export default function PlayerCard({name, id, country, coverUrl, rank, pickDate}) {   
     return (
-      <a href={`https://osu.ppy.sh/users/${id}`}>
+      <Link to={`/profile/${id}`}>
       <div className="flex items-center justify-between rounded-lg relative p-2 px-3 bg-cover bg-center overflow-hidden h-14 text-white shadow-sm hover:opacity-80 transition-all transform duration-300 hover:-translate-y-px hover:shadow-lg"
         style={{
             backgroundImage: `url(${coverUrl}`,
@@ -16,10 +17,10 @@ export default function PlayerCard({name, id, country, coverUrl, rank, pickDate}
                 svg
                 className='rounded-md text-3xl'
             />
-            <p className='text-xl'>{id==0 ? 'Unknown User' : name}</p><i className='text-md text-gray-400 -ml-2'> (#{Number(rank).toLocaleString()})</i>
+            <p className='text-xl'>{id==0 ? 'Unknown User' : name}</p><i className='text-base text-gray-400 -ml-2'> (#{Number(rank).toLocaleString()})</i>
         </div>
             <p className='text-sm opacity-80 px-2'>{pickDate && `Picked ${timeAgo(pickDate)}`}</p>
         </div>
-      </a>
+      </Link>
     )
 }

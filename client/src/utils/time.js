@@ -35,3 +35,9 @@ export function getYesterdayDate() {
 
     return formattedDate;
 }
+
+export function convertSecondsToDaysHours(seconds) {
+    const days = Math.floor(seconds / (24 * 3600));
+    const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+    return `${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+}

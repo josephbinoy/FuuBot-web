@@ -8,6 +8,7 @@ import CaretDownIcon from "./CaretDownIcon";
 import CaretUpIcon from "./CaretUpIcon";
 import { getYesterdayDate } from "../utils/time";
 import axios from "axios";
+import { Link } from "react-router-dom";
   
 export default function LeaderBoard({period, currentLeaderboard, setcurrentLeaderboard}) {
   const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
@@ -114,7 +115,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                       </div>
                     </td>
                     <td className='p-4'>
-                      <a className="flex gap-3 items-center justify-start" href={`https://osu.ppy.sh/users/${row.id}`}>
+                      <Link className="flex gap-3 items-center justify-start" to={`/profile/${row.id}`}>
                         <img src={`https://a.ppy.sh/${row.id}`} alt="pfp" className="w-10 h-10 rounded-reg" />
                         <ReactCountryFlag
                             countryCode={row.country}
@@ -127,7 +128,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                       >
                         {row.name}
                       </Typography>
-                      </a>
+                      </Link>
                     </td>
                     <td className='p-4'>
                       <Typography

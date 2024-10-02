@@ -33,7 +33,7 @@ function NavList() {
   );
 }
  
-export default function CustomNavbar() {
+export default function CustomNavbar({classes}) {
   const [openNav, setOpenNav] = useState(false);
  
   const handleWindowResize = () =>
@@ -48,7 +48,7 @@ export default function CustomNavbar() {
   }, []);
  
   return (
-    <Navbar className="mx-auto max-w-screen-xl px-6 py-3 h-22" color="blue-gray" >
+    <Navbar className={`mx-auto max-w-screen-xl px-6 py-3 h-22 ${classes ? classes : ''}`} color="blue-gray" >
       <div className="flex items-center justify-between">
         <div className="flex justify-evenly items-center hover:opacity-70 opacity-60">
           <img src="/logo.png" alt="logo" className="h-8 mx-1 mt-1"></img>
