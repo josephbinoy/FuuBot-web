@@ -10,7 +10,7 @@ export default function PlayerCard({name, id, country, coverUrl, rank, playTime,
         placement="top-start"
         content={
             <>
-                <p>{`Rank: #${rank}`}</p>
+                <p>{`Rank: #${Number(rank).toLocaleString()}`}</p>
                 <p>{`Playtime: ${convertSecondsToDaysHours(playTime)}`}</p>
             </>
         }
