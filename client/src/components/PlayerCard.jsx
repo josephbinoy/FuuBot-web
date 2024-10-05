@@ -7,7 +7,7 @@ export default function PlayerCard({name, id, country, coverUrl, rank, playTime,
     console.log(pickCount);
     return (
         <Tooltip
-        className="bg-black bg-opacity-20 p-2 px-3 backdrop-blur-sm"
+        className="bg-black bg-opacity-80 p-2 px-3 backdrop-blur-sm"
         placement="top-start"
         content={
             <>
