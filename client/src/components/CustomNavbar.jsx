@@ -1,9 +1,9 @@
-import { useEffect, useState} from "react";
+import { useState, useEffect} from "react";
 import {
   Navbar,
   Collapse,
   Typography,
-  IconButton
+  IconButton,
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, Link } from "react-router-dom";
@@ -11,23 +11,11 @@ import { NavLink, Link } from "react-router-dom";
 function NavList() {
   return (
     <ul className="my-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-      <NavLink to={"/"} className={({ isActive }) => isActive ? 'text-osuslate-50 scale-105' : ''} >
-        <Typography
-          as="li"
-          variant="h4"
-          className="p-1 font-extrabold font-visby"
-        >
+      <NavLink to={"/"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
           Beatmaps
-        </Typography>
       </NavLink>
-      <NavLink to={"/players"} className={({ isActive }) => isActive ? 'text-osuslate-50 scale-105' : ''}>
-        <Typography
-          as="li"
-          variant="h4"
-          className="p-1 font-extrabold font-visby"
-        >
+      <NavLink to={"/players"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
           Players
-        </Typography>
       </NavLink>
     </ul>
   );
@@ -48,9 +36,9 @@ export default function CustomNavbar({classes}) {
   }, []);
  
   return (
-    <Navbar className={`mx-auto max-w-screen-xl px-6 py-3 h-22 ${classes ? classes : ''}`} color="blue-gray" >
+    <Navbar className={`mx-auto max-w-screen-xl px-6 py-3 min-h-22 ${classes ? classes : ''}`} color="blue-gray">
       <div className="flex items-center justify-between">
-        <div className="flex justify-evenly items-center hover:opacity-70 opacity-60">
+      <div className="flex justify-evenly items-center hover:opacity-70 opacity-60">
           <img src="/logo.png" alt="logo" className="h-8 mx-1 mt-1"></img>
           <Typography
             as={Link}
