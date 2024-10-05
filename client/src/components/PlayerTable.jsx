@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useDbv } from "../context/DbvProvider";
 import { useEffect, useState, useRef } from 'react';
 import { useAlert } from "../context/AlertProvider";
+import { timeAgo } from "../utils/time";
 
 export default function PlayerTable({ id }) {
     const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]);
@@ -12,6 +13,8 @@ export default function PlayerTable({ id }) {
     const [dataEnd, setDataEnd] = useState(false);
     const observer = useRef();
     const { dbv } = useDbv();
+    let previousPickDate = null;
+    let isFirstGroup = false;
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -91,16 +94,40 @@ export default function PlayerTable({ id }) {
 
     return (
         <div className="flex flex-col">
-            <p className="text-osuslate-100 font-bold pb-2 sticky bg-osuslate-500 z-30 top-62">Pick History</p>
-            {rows.map((row, index) => 
-                row ? <PlayerMapItem 
-                    key={index} 
-                    mapId={row.BEATMAP_ID} 
-                    mapName={row.t} 
-                    mapArtist={row.a} 
-                    mapper={row.m} 
-                    pickDate={row.PICK_DATE} /> : 
-                <SkeletonPlayerMapItem key={index}/>)}
+            <div className="sticky top-62 z-30 pb-2 bg-osuslate-500">
+                <p className="text-osuslate-100 font-bold pb-2">Pick History</p>
+                <hr className="border-osuslate-100 border-2 w-full border-opacity-50" />
+            </div>
+            {rows.map((row, index) => {
+                let showPickDate = false;
+                let currentPickDate = null;
+                if (row){
+                    currentPickDate = timeAgo(row.PICK_DATE);
+                    showPickDate = currentPickDate !== previousPickDate;
+                    if (previousPickDate === null) {
+                        isFirstGroup = true;
+                    }
+                    else {
+                        isFirstGroup = false;
+                    }
+                    previousPickDate = currentPickDate;
+                }
+                return row ? (
+                    <div key={index} className="mb-4">
+                        {showPickDate && (
+                            <p className={`text-osuslate-100 font-bold pb-4 text-lg ${isFirstGroup ? "mt-2" : "mt-20"}`}>{currentPickDate}</p>
+                        )}
+                        <PlayerMapItem
+                            mapId={row.BEATMAP_ID}
+                            mapName={row.t}
+                            mapArtist={row.a}
+                            mapper={row.m}
+                        />
+                    </div>
+                ) : (
+                    <SkeletonPlayerMapItem key={index} />
+                );
+            })}
             <div id={`player-sentinel`} className="h-1"></div>
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-lg mb-4">End of Data</p>}
         </div>

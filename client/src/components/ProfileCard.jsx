@@ -37,7 +37,7 @@ export default function ProfileCard({ id }) {
         fetchData();
     }, []);
     return (
-        <div className='w-10/12 flex flex-col items-center justify-center rounded-lg relative overflow-hidden bg-osuslate-200 shadow-lg'>
+        <div className='w-10/12 flex flex-col items-center justify-center rounded-lg relative overflow-hidden bg-osuslate-300 shadow-lg'>
         <a href={`https://osu.ppy.sh/users/${id}`}><ArrowTopRightOnSquareIcon height={25} width={25} className="absolute top-3 right-3 text-gray-300 z-30 opacity-70" /></a>
             <div className="absolute inset-0 h-24 2xl:h-32 w-full">
                 <div

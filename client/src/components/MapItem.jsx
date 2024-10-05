@@ -11,7 +11,7 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, mapCount=0, 
     }
     const borderColorClass = mapCount >= limit ? 'border-red-500' : mapCount >= limit * 0.75 ? 'border-orange-500' : 'border-green-500';    
     return (
-      <Link to={`history/${mapId}`} className="mx-auto max-w-screen-xl w-11/12 my-2">
+      <Link to={`history/${mapId}`} state={{ fromApp: true }} className="mx-auto max-w-screen-xl w-11/12 my-2">
         <div
           className={`relative flex items-center justify-between h-20 rounded-lg px-6 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-white border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
             <div

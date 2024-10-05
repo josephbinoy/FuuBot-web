@@ -170,6 +170,12 @@ async function main(){
                 AND PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
                 ORDER BY PICK_DATE DESC
             `;
+            const query3 = `
+                SELECT COUNT(*) AS total_count
+                FROM PICKS 
+                WHERE PICKER_ID = ?
+            `;
+
             const rows = memClient.prepare(query2).all(id);
             const history = [];
             const meta = await redisMeta.hGetAll(`fuubot:beatmap-${id}`);
@@ -179,12 +185,18 @@ async function main(){
             }
             for (const row of rows) {
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
+                let pickCount = memClient.prepare(query3).get(row.PICKER_ID);
+                if (!pickCount) {
+                    pickCount = 0;
+                }
                 history.push({ 
                     id: row.PICKER_ID, 
                     n: player.n,
                     con_c: player.con_c,
                     cv: player.cv,
-                    gr: player.gr, 
+                    gr: player.gr,
+                    pt: player.pt,
+                    pickCount: pickCount.total_count,
                     pickDate: row.PICK_DATE });
             }
             const result = { 

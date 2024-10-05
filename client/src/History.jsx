@@ -4,7 +4,7 @@ import PlayerCard from "./components/PlayerCard";
 import SkeletonPlayerCard from "./skeletons/SkeletonPlayerCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation} from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import SkeletonMapCard from "./skeletons/SkeletonMapCard";
 import { useAlert } from "./context/AlertProvider";
@@ -15,6 +15,8 @@ export default function History() {
     const [map, setMap] = useState({});
     const [totalCount, setTotalCount] = useState(null);
     const id = useParams().beatmapId;
+    const navigate = useNavigate();
+    const { state } = useLocation();
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -49,10 +51,20 @@ export default function History() {
             background: "linear-gradient(180deg, rgba(35, 39, 50, 1)5%, rgba(0, 0, 0, 0.5) 50%, rgba(35,39,50,1) 95%)"
             }}/>
             <div className="absolute inset-0 filter backdrop-blur-lg xl:backdrop-blur-xl" />
-            <div className="relative mx-auto max-w-screen-xl flex items-center justify-between h-32 ">
-                <Link to="/" className="absolute -top-6 text-lg text-osuslate-100 font-bold flex items-center opacity-70">
+            <div className="relative mx-auto max-w-screen-xl flex items-center justify-between h-32 z-40">
+                <button
+                    onClick={() => {
+                        const fromApp = state && state.fromApp;
+                        if (fromApp) {
+                            navigate(-1);
+                            } else {
+                            navigate('/');
+                            }
+                    }}
+                    className="absolute -top-7 text-lg text-osuslate-100 font-bold flex items-center opacity-70"
+                >
                     <ChevronLeftIcon className="opacity-80 h-5 w-5 mr-1" strokeWidth={3} />Back
-                </Link>
+                </button>
                 <h1 className="text-5xl text-gray-300 font-black px-10 mb-2">Beatmap History</h1>
             </div>
             {map.t ? <MapCard 
@@ -83,6 +95,8 @@ export default function History() {
                         name={row.n} 
                         country={row.con_c}
                         rank={row.gr}
+                        playTime={row.pt}
+                        pickCount={row.pickCount}
                         pickDate={row.pickDate} 
                         coverUrl={row.cv} 
                     />
