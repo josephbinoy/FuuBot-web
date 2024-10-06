@@ -52,7 +52,11 @@ export default function ProfileCard({ id }) {
                 <img src={`https://a.ppy.sh/${id}`} className='h-20 w-20 2xl:h-24 2xl:w-24 rounded-xl shadow-lg'></img>
                 <div className='flex flex-col items-center justify-center self-end w-fit pl-5'>
                     <div className='flex items-center justify-center gap-2 pt-4'>
+                    {playerData.n ? (
                         <p className='text-2xl text-gray-300 font-bold truncate'>{playerData.n}</p>
+                    ) : (
+                        <p className='h-7 w-32 bg-osuslate-100 rounded-md opacity-70 animate-pulse' />
+                    )}
                         {playerData.sp === "true" && <div className='flex h-6 w-6 items-center justify-center bg-[#ff66ab] rounded-full'>
                             <HeartIcon className='h-4 w-4 text-white' />
                         </div>}
@@ -63,26 +67,65 @@ export default function ProfileCard({ id }) {
                             svg
                             className='rounded-md text-xl'
                         />
-                        <p className='text-base text-gray-300 opacity-70'>{playerData.con_n}</p>
+                        {playerData.con_n ? (
+                            <p className='text-base text-gray-300 opacity-70'>{playerData.con_n}</p>
+                        ) : (
+                            <p className='h-5 w-24 bg-osuslate-100 rounded-reg opacity-70 animate-pulse mt-2' />
+                        )}
                     </div>
                 </div>
             </div>
             <div className='flex h-20 items-start justify-center w-full mt-4 2xl:mt-8'>
-                <div className='w-6/12 border-r border-gray-500 border-opacity-40 flex items-center justify-center flex-col'>
-                    <p className='text-gray-300 opacity-70 text-base'>weekly picks</p>
-                    <p className='text-3xl text-gray-300'>{pickCounts.weeklyCount}</p>
-                </div>
-                <div className='w-6/12 flex items-center justify-center flex-col'>
-                    <p className='text-gray-300 opacity-70 text-base'>alltime picks</p>
-                    <p className='text-3xl text-gray-300'>{pickCounts.alltimeCount}</p>
-                </div>
+            <div className='w-6/12 border-r border-gray-500 border-opacity-40 flex items-center justify-center flex-col'>
+                <p className='text-gray-300 opacity-70 text-base'>weekly picks</p>
+                <p className='text-3xl text-gray-300'>{pickCounts.weeklyCount}</p>
+            </div>
+            <div className='w-6/12 flex items-center justify-center flex-col'>
+                <p className='text-gray-300 opacity-70 text-base'>alltime picks</p>
+                <p className='text-3xl text-gray-300'>{pickCounts.alltimeCount}</p>
+            </div>
             </div>
             <div className='w-full px-5 pb-5 flex flex-col items-start justify-evenly text-gray-300 text-base 2xl:gap-2 -mt-2 2xl:mt-2'>
-                <div className='flex items-center justify-between w-full'><p className='opacity-70'>Global Rank: </p><p>#{Number(playerData.gr).toLocaleString()}</p></div>
-                <div className='flex items-center justify-between w-full'><p className='opacity-70'>pp: </p><p>{Number(Number(playerData.pp).toFixed(0)).toLocaleString()}</p></div>
-                <div className='flex items-center justify-between w-full'><p className='opacity-70'>Accuracy: </p><p>{Number(playerData.acc).toFixed(2)}%</p></div>
-                <div className='flex items-center justify-between w-full'><p className='opacity-70'>Play Time: </p><p>{convertSecondsToDaysHours(playerData.pt)}</p></div>
-                <div className='flex items-center justify-between w-full'><p className='opacity-70'>Play Count: </p><p>{Number(playerData.pc).toLocaleString()}</p></div>
+            <div className='flex items-center justify-between w-full'>
+                <p className='opacity-70'>Global Rank: </p>
+                {playerData.gr ? (
+                    <p>#{Number(playerData.gr).toLocaleString()}</p>
+                ) : (
+                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                )}
+            </div>
+            <div className='flex items-center justify-between w-full'>
+                <p className='opacity-70'>pp: </p>
+                {playerData.pp ? (
+                    <p>{Number(Number(playerData.pp).toFixed(0)).toLocaleString()}</p>
+                ) : (
+                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                )}
+            </div>
+            <div className='flex items-center justify-between w-full'>
+                <p className='opacity-70'>Accuracy: </p>
+                {playerData.acc ? (
+                    <p>{Number(playerData.acc).toFixed(2)}%</p>
+                ) : (
+                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                )}
+            </div>
+            <div className='flex items-center justify-between w-full'>
+                <p className='opacity-70'>Play Time: </p>
+                {playerData.pt ? (
+                    <p>{convertSecondsToDaysHours(playerData.pt)}</p>
+                ) : (
+                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                )}
+            </div>
+            <div className='flex items-center justify-between w-full'>
+                <p className='opacity-70'>Play Count: </p>
+                {playerData.pc ? (
+                    <p>{Number(playerData.pc).toLocaleString()}</p>
+                ) : (
+                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                )}
+            </div>
             </div>
         </div>
     )

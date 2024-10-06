@@ -1,7 +1,7 @@
-export default function SkeletonRow() {
+export default function SkeletonSideboardRow() {
     return (
         <tr className= "animate-pulse h-20 opacity-20 border-b border-gray-700/10">
-            <td className='pl-10'>
+            <td className='p-4 px-12'>
                 <div className="w-8 h-8 bg-gray-300 rounded-md"/>
             </td>
             <td className='p-4'>
@@ -11,10 +11,7 @@ export default function SkeletonRow() {
                     <p className='rounded-md h-8 w-40 bg-gray-300'></p>
                 </div>
             </td>
-            <td className='p-4 pl-12'>
-                <div className="w-8 h-8 bg-gray-300 rounded-md"/>
-            </td>
-            <td className='p-4 pl-12'>
+            <td className='p-4 px-16'>
                 <div className="w-8 h-8 bg-gray-300 rounded-md"/>
             </td>
         </tr>

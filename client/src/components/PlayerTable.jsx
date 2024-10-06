@@ -125,7 +125,7 @@ export default function PlayerTable({ id }) {
                         />
                     </div>
                 ) : (
-                    <SkeletonPlayerMapItem key={index} />
+                    <SkeletonPlayerMapItem key={index} idx={index} />
                 );
             })}
             <div id={`player-sentinel`} className="h-1"></div>

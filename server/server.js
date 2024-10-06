@@ -100,6 +100,73 @@ function getLeaderboardQuery(period) {
         LIMIT 50`;
 }
 
+
+function getSideboardQuery(type) {
+    if (type !== 'unique' && type !== 'overplayed') {
+        return null;
+    }
+    
+    if(type === 'unique'){
+        return `
+        SELECT PICKER_ID, COUNT(*) as PICK_COUNT
+        FROM PICKS
+        WHERE BEATMAP_ID IN (
+            SELECT BEATMAP_ID
+            FROM PICKS
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) = 1
+        )
+        AND PICKER_ID != 0
+        GROUP BY PICKER_ID
+        ORDER BY PICK_COUNT DESC
+        LIMIT 10;`
+    }
+    else{
+        return `
+        WITH OverplayedMaps AS (
+        SELECT DISTINCT BEATMAP_ID, PICKER_ID 
+        FROM PICKS 
+        WHERE BEATMAP_ID IN (
+            SELECT BEATMAP_ID
+            FROM PICKS
+            WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) > ${process.env.WEEKLY_LIMIT}
+
+            UNION
+
+            SELECT BEATMAP_ID
+            FROM PICKS
+            WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400)
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) > ${process.env.MONTHLY_LIMIT}
+
+            UNION
+
+            SELECT BEATMAP_ID
+            FROM PICKS
+            WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400)
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) > ${process.env.YEARLY_LIMIT}
+
+            UNION
+
+            SELECT BEATMAP_ID
+            FROM PICKS
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) > ${process.env.ALLTIME_LIMIT}
+        )
+        )
+
+        SELECT PICKER_ID, COUNT(*) AS PICK_COUNT
+        FROM OverplayedMaps
+        WHERE PICKER_ID != 0
+        GROUP BY PICKER_ID
+        ORDER BY PICK_COUNT DESC
+        LIMIT 10;`
+    }
+}
+
 function getYesterdayLeaderboardQuery(period) {
     const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
     
@@ -365,6 +432,44 @@ async function main(){
         }
     });
 
+    app.get('/api/sideboard/:type', async (req, res) => {
+        const { type } = req.params;
+        const cacheKey = `fuubot:cache-sideboard-${type}`;   
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {     
+                    res.json(JSON.parse(cachedResult));      
+                    return;
+                }
+            }
+            const query = getSideboardQuery(type);
+            if (!query) {
+                res.status(400).json({ error: 'Invalid parameters' });
+            }
+            const rows = memClient.prepare(query).all();
+            const result = [];
+            for (const row of rows) {
+                const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
+                if (player.n) {
+                    result.push({
+                        id: row.PICKER_ID,
+                        name: player.n,
+                        country: player.con_c,
+                        pickCount: row.PICK_COUNT, 
+                    });
+                }
+            }
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }            
+            res.json(result);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.get('/api/profile/picks/:id', async (req, res) => {
         const id = parseInt(req.params.id);
         const pageNo = parseInt(req.query.pageNo);
@@ -425,7 +530,7 @@ async function main(){
         try {
             if (!isDeletingCache) {
                 const cachedResult = await redisCache.get(cacheKey);
-                if (cachedResult) {                  
+                if (cachedResult) {
                     res.json(JSON.parse(cachedResult));
                     return;
                 }

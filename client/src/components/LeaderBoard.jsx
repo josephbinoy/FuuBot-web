@@ -37,9 +37,8 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
     fetchData();
 }, []);
 
-  return (<>
-    <h1 className="text-4xl text-gray-300 font-black px-10">Top 50 Most Picks</h1>
-    <Card className="mx-10 my-7 overflow-hidden bg-osuslate-200/50">
+  return (
+    <Card className="mx-5 overflow-hidden bg-osuslate-200/50">
       <CardBody className="p-0">
         <table className="w-full min-w-max table-auto text-center">
          <thead className="bg-osuslate-200 z-20">
@@ -51,9 +50,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                       <p>Rank changes are relative to {rankFrameDate}, 00:00 UTC</p>                   
                     }
                   >
-                  <Typography
-                    color="blue-gray"
-                  >
+                  <Typography color="blue-gray">
                     Rank
                   </Typography>
                   </Tooltip>
@@ -93,26 +90,21 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
           </thead>
           <tbody>
             {rows.map((row, index) => row ? <tr key={index} className={`${index==rows.length-1?'':'border-black/10 border-b'} h-20`}>
-                  <td className='p-4'>
-                    <div className="flex items-center justify-end gap-2">
+                  <td className='p-4 relative'>
                       <Typography 
                         color="blue-gray"
-                        className="px-4"
                       >
                         {index+1}
                       </Typography>
                       {row.delta && row.delta > 0 ?
-                        <div className="flex items-center justify-center gap-1 w-7">
+                        <div className="flex items-center justify-center gap-1 w-7 absolute right-3 top-[26px]">
                           <CaretUpIcon classes="min-w-4 min-h-4 stroke-red-500"/>
                           <p className="text-green-500">{row.delta}</p>
-                        </div> : row.delta < 0 ?
-                        <div className="flex items-center justify-center gap-1 w-7">
+                        </div> : row.delta < 0 &&
+                        <div className="flex items-center justify-center gap-1 w-7 absolute right-3 top-[26px]">
                           <CaretDownIcon classes="min-w-4 min-h-4" />
                           <p className="text-red-500">{Math.abs(row.delta)}</p>
-                        </div>:
-                        <div className="w-7">
                         </div>}
-                      </div>
                     </td>
                     <td className='p-4'>
                       <Link className="flex gap-3 items-center justify-start" to={`/profile/${row.id}`} state={{ fromApp: true }}>
@@ -152,6 +144,5 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
         </table>
       </CardBody>
     </Card>
-    </>
   );
 }
