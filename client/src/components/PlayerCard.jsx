@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Tooltip } from '@material-tailwind/react';
 
 export default function PlayerCard({name, id, country, coverUrl, rank, playTime, pickCount, pickDate}) { 
-    console.log(pickCount);
     return (
         <Tooltip
         className="bg-black bg-opacity-80 p-2 px-3 backdrop-blur-sm"

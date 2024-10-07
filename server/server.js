@@ -131,7 +131,7 @@ function getSideboardQuery(type) {
             FROM PICKS
             WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) > ${process.env.WEEKLY_LIMIT}
+            HAVING COUNT(*) >= ${process.env.WEEKLY_LIMIT}
 
             UNION
 
@@ -139,7 +139,7 @@ function getSideboardQuery(type) {
             FROM PICKS
             WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400)
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) > ${process.env.MONTHLY_LIMIT}
+            HAVING COUNT(*) >= ${process.env.MONTHLY_LIMIT}
 
             UNION
 
@@ -147,14 +147,14 @@ function getSideboardQuery(type) {
             FROM PICKS
             WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400)
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) > ${process.env.YEARLY_LIMIT}
+            HAVING COUNT(*) >= ${process.env.YEARLY_LIMIT}
 
             UNION
 
             SELECT BEATMAP_ID
             FROM PICKS
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) > ${process.env.ALLTIME_LIMIT}
+            HAVING COUNT(*) >= ${process.env.ALLTIME_LIMIT}
         )
         )
 
