@@ -1,4 +1,5 @@
 import MapItem from "./MapItem";
+import BlackItem from "./BlackItem";
 import SkeletonItem from "../skeletons/SkeletonItem";
 import axios from 'axios';
 import { useDbv } from "../context/DbvProvider";
@@ -89,14 +90,27 @@ export default function MapTable( { tableType }) {
     return (
         <div className="flex flex-col mt-1">
             {rows.map((row, index) => 
-                row ? <MapItem 
+                row ? row.isBlacklisted ? <BlackItem 
                     key={index} 
-                    tabletype={tableType} 
                     mapId={row.BEATMAP_ID} 
                     mapName={row.t} 
                     mapArtist={row.a} 
                     mapper={row.m} 
-                    mapCount={row.pick_count} /> : 
+                    weeklyCount={row.weekly_count}
+                    monthlyCount={row.monthly_count}
+                    yearlyCount={row.yearly_count}
+                    alltimeCount={row.alltime_count}
+                /> :
+                <MapItem 
+                    key={index} 
+                    mapId={row.BEATMAP_ID} 
+                    mapName={row.t} 
+                    mapArtist={row.a} 
+                    mapper={row.m} 
+                    weeklyCount={row.weekly_count}
+                    monthlyCount={row.monthly_count}
+                    yearlyCount={row.yearly_count}
+                    alltimeCount={row.alltime_count} />: 
                 <SkeletonItem key={index} type="popular"/>)}
             <div id={`${tableType}-sentinel`} className="h-1"></div>
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}

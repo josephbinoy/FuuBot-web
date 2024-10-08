@@ -45,6 +45,9 @@ export default withMT({
         '62': '15.5rem',
         '70': '17.5rem',
       },
+      divideWidth: {
+        '1': '1px'
+      }
     },
   },
   plugins: [require('tailwind-scrollbar')]});

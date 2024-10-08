@@ -47,8 +47,7 @@ export default function Blacklist() {
                     mapId={row.beatmapId} 
                     mapName={row.t} 
                     mapArtist={row.a} 
-                    mapper={row.m} 
-                    imageUrl={`https://assets.ppy.sh/beatmaps/${row.beatmapId}/covers/slimcover.jpg`}/> : 
+                    mapper={row.m} /> : 
                 <SkeletonItem key={index} type="blacklist"/>)}
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}
         </div>

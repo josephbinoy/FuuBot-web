@@ -64,7 +64,6 @@ const theme = {
         initial: {
           fontFamily: "font-visby",
           fontWeight: "font-bold",
-          textTransform: "lowercase",
           transition: "transition-all",
           disabled: "disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none",
         },

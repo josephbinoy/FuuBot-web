@@ -22,7 +22,7 @@ const redisCache = await getRedisCacheClient();
 const updateQueue = new UpdateQueue();
 let lastUpdateTimestamp = 0;
 let isDeletingCache = false;
-let blacklist = [];
+let blacklist = new Set();
 let bearerToken = '';
 
 async function updateAndHydrate(newRows) {
@@ -49,41 +49,34 @@ async function updateBlacklist(){
 }
 
 function getBeatmapQuery(period) {
+    let orderBy = '';
     switch (period) {
         case 'weekly':
-            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
-            FROM PICKS 
-            WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400) 
-            GROUP BY BEATMAP_ID 
-            ORDER BY pick_count DESC 
-            LIMIT (?) 
-            OFFSET (?)`;
+            orderBy = 'weekly_count';
+            break;
         case 'monthly':
-            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
-            FROM PICKS 
-            WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400) 
-            GROUP BY BEATMAP_ID 
-            ORDER BY pick_count DESC 
-            LIMIT (?) 
-            OFFSET (?)`;
+            orderBy = 'monthly_count';
+            break;
         case 'yearly':
-            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
-            FROM PICKS 
-            WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400) 
-            GROUP BY BEATMAP_ID 
-            ORDER BY pick_count DESC 
-            LIMIT (?) 
-            OFFSET (?)`;
+            orderBy = 'yearly_count';
+            break;
         case 'alltime':
-            return `SELECT BEATMAP_ID, COUNT(*) as pick_count 
-            FROM PICKS 
-            GROUP BY BEATMAP_ID 
-            ORDER BY pick_count DESC 
-            LIMIT (?) 
-            OFFSET (?)`;
+            orderBy = 'alltime_count';
+            break;
         default:
-            return null;
+            return '';
     }
+    return `
+    SELECT BEATMAP_ID, 
+           COUNT(*) as alltime_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+    FROM PICKS
+    GROUP BY BEATMAP_ID
+    ORDER BY ${orderBy} DESC 
+    LIMIT (?) 
+    OFFSET (?)`;
 }
 
 function getLeaderboardQuery(period) {
@@ -167,6 +160,38 @@ function getSideboardQuery(type) {
     }
 }
 
+function showStats(){
+    const query = `
+    SELECT COUNT(*) as alltime_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+    FROM PICKS;`
+    const row = memClient.prepare(query).get();
+    logger.info(`All-time count: ${row.alltime_count}`);
+    logger.info(`Weekly count: ${row.weekly_count}`);
+    logger.info(`Monthly count: ${row.monthly_count}`);
+    logger.info(`Yearly count: ${row.yearly_count}`);
+}
+
+async function setAlltimeLimits(){
+    const query = `
+    SELECT BEATMAP_ID, COUNT(*) as alltime_count
+    FROM PICKS
+    GROUP BY BEATMAP_ID
+    ORDER BY alltime_count DESC
+    LIMIT 1 OFFSET 100;`
+    const row = memClient.prepare(query).get();
+    if (row.alltime_count) {
+        process.env.ALLTIME_LIMIT = row.alltime_count;
+        await deleteCache(redisCache);
+        logger.info(`Set New Alltime Limit: ${row.alltime_count}`);
+    }
+    else {
+        logger.error('Error calculating new alltime limit');
+    }
+}
+
 function getYesterdayLeaderboardQuery(period) {
     const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
     
@@ -183,10 +208,9 @@ function getYesterdayLeaderboardQuery(period) {
 
 async function getBlacklist() {
     const data = await fs.readFile(process.env.BLACKLIST_TXT_PATH, 'utf-8');
-    const blacklist = data.split('\n')
+    const blacklist = new Set(data.split('\n')
         .map(line => parseInt(line.trim()))
-        .filter(id => !isNaN(id))
-        .map(id => ({ beatmapId: id }));
+        .filter(id => !isNaN(id)));
     return blacklist;
 }
 
@@ -292,10 +316,10 @@ async function main(){
                 }
             }
             const result = [];
-            for (const row of blacklist) {
-                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.beatmapId}`);
+            for (const beatmapId of blacklist) {
+                const meta = await redisMeta.hGetAll(`fuubot:beatmap-${beatmapId}`);
                 if (meta.t) {
-                    result.push({ ...row, ...meta });
+                    result.push({ beatmapId: beatmapId , ...meta });
                 }
             }
             if (!isDeletingCache) {
@@ -342,7 +366,8 @@ async function main(){
             for (const row of rows) {
                 const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
                 if (meta.t) {
-                    result.push({ ...row, ...meta });
+                    let isBlacklisted = blacklist.has(row.BEATMAP_ID);
+                    result.push({ ...row, ...meta, isBlacklisted: isBlacklisted });
                 }
             }
             if (!isDeletingCache) {
@@ -381,6 +406,33 @@ async function main(){
                 res.status(200).json({ message: 'received' });
             } catch (error) {
                 logger.error('Error updating with new rows:', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        });
+
+    app.get('/api/limits', async (req, res, next) => {
+        const allowedHosts = ['127.0.0.1', '::1', 'localhost'];
+        const requestHost = req.hostname;
+
+        if (!requestHost) {
+            return res.status(400).send('Bad Request');
+        }
+        
+        if (!allowedHosts.includes(requestHost)) {
+            return res.status(403).send('Forbidden');
+        }
+        next();
+        }, async (req, res) => {
+            try{
+                const limit = Number(process.env.ALLTIME_LIMIT);
+                if (!isNaN(limit)) {
+                    res.json(limit);
+                }
+                else {
+                    res.status(500).json({ error: 'ALLTIME_LIMIT is not a number' });
+                }
+            } catch (error) {
+                logger.error('Error sending limit:', error);
                 res.status(500).json({ error: 'Internal Server Error' });
             }
         });
@@ -594,4 +646,11 @@ rl.on('line', async (input) => {
     if (input.trim().toLowerCase() === 'refresh') {
         await refreshPlayerData(redisMeta, memClient);
     }
+    if (input.trim().toLowerCase() === 'stats') {
+        showStats();
+    }
+    if (input.trim().toLowerCase() === 'update limit') {
+        setAlltimeLimits();
+    }
 });
+

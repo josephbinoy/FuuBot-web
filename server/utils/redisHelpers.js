@@ -228,12 +228,10 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
     }
 }
 
-export async function hydrateRedisFromBlacklist(redisClient, bearerToken,  rows){
+export async function hydrateRedisFromBlacklist(redisClient, bearerToken, blacklist){
     if (!bearerToken) return;
     redisLogger.info('Hydrating Redis with beatmap metadata from blacklist...');
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        const beatmapId = Number(row.beatmapId);
+    for (const beatmapId of blacklist) {
         try {
             if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);

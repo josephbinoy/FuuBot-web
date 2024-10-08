@@ -55,7 +55,7 @@ export default function ProfileCard({ id }) {
                     {playerData.n ? (
                         <p className='text-2xl text-gray-300 font-bold truncate'>{playerData.n}</p>
                     ) : (
-                        <p className='h-7 w-32 bg-osuslate-100 rounded-md opacity-70 animate-pulse' />
+                        <p className='h-6 2xl:h-7 w-32 bg-osuslate-100 rounded-reg 2xl:rounded-md opacity-70 animate-pulse' />
                     )}
                         {playerData.sp === "true" && <div className='flex h-6 w-6 items-center justify-center bg-[#ff66ab] rounded-full'>
                             <HeartIcon className='h-4 w-4 text-white' />
@@ -70,7 +70,7 @@ export default function ProfileCard({ id }) {
                         {playerData.con_n ? (
                             <p className='text-base text-gray-300 opacity-70'>{playerData.con_n}</p>
                         ) : (
-                            <p className='h-5 w-24 bg-osuslate-100 rounded-reg opacity-70 animate-pulse mt-2' />
+                            <p className='h-5 w-20 bg-osuslate-100 rounded-reg opacity-70 animate-pulse mt-2' />
                         )}
                     </div>
                 </div>
@@ -91,7 +91,7 @@ export default function ProfileCard({ id }) {
                 {playerData.gr ? (
                     <p>#{Number(playerData.gr).toLocaleString()}</p>
                 ) : (
-                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded-md opacity-50' />
                 )}
             </div>
             <div className='flex items-center justify-between w-full'>
@@ -99,7 +99,7 @@ export default function ProfileCard({ id }) {
                 {playerData.pp ? (
                     <p>{Number(Number(playerData.pp).toFixed(0)).toLocaleString()}</p>
                 ) : (
-                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded opacity-50' />
                 )}
             </div>
             <div className='flex items-center justify-between w-full'>
@@ -107,7 +107,7 @@ export default function ProfileCard({ id }) {
                 {playerData.acc ? (
                     <p>{Number(playerData.acc).toFixed(2)}%</p>
                 ) : (
-                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded opacity-50' />
                 )}
             </div>
             <div className='flex items-center justify-between w-full'>
@@ -115,7 +115,7 @@ export default function ProfileCard({ id }) {
                 {playerData.pt ? (
                     <p>{convertSecondsToDaysHours(playerData.pt)}</p>
                 ) : (
-                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded opacity-50' />
                 )}
             </div>
             <div className='flex items-center justify-between w-full'>
@@ -123,7 +123,7 @@ export default function ProfileCard({ id }) {
                 {playerData.pc ? (
                     <p>{Number(playerData.pc).toLocaleString()}</p>
                 ) : (
-                    <p className='h-6 w-24 bg-osuslate-100 animate-pulse rounded-md opacity-50' />
+                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded opacity-50' />
                 )}
             </div>
             </div>
