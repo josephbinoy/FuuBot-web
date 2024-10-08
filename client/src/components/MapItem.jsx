@@ -25,9 +25,9 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, weeklyCount=
     }
 
     return (
-      <Link to={`history/${mapId}`} state={{ fromApp: true }} className="mx-auto max-w-screen-xl w-11/12 my-2">
+      <Link to={`history/${mapId}`} state={{ fromApp: true }} className="w-full">
         <div
-          className={`relative flex items-center justify-between h-20 rounded-lg px-6 pr-3 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-white border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
+          className={`relative flex items-center justify-between h-20 rounded-lg px-6 pr-3 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-gray-100 border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
             <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-105"
                 style={{

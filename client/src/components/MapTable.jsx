@@ -90,7 +90,9 @@ export default function MapTable( { tableType }) {
     return (
         <div className="flex flex-col mt-1">
             {rows.map((row, index) => 
-                row ? row.isBlacklisted ? <BlackItem 
+            <div className="flex items-center justify-center gap-4 mx-auto max-w-screen-xl w-11/12 my-2"> 
+            <p className="text-xl text-gray-300 font-bold min-w-8 text-center">{index+1}</p>
+            {row ? row.isBlacklisted ? <BlackItem 
                     key={index} 
                     mapId={row.BEATMAP_ID} 
                     mapName={row.t} 
@@ -111,7 +113,8 @@ export default function MapTable( { tableType }) {
                     monthlyCount={row.monthly_count}
                     yearlyCount={row.yearly_count}
                     alltimeCount={row.alltime_count} />: 
-                <SkeletonItem key={index} type="popular"/>)}
+                <SkeletonItem key={index} type="popular"/>}
+                </div>)}
             <div id={`${tableType}-sentinel`} className="h-1"></div>
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}
         </div>

@@ -42,13 +42,17 @@ export default function Blacklist() {
         </div>
         <div className="flex flex-col">
             {rows.map((row, index) => 
-                row ? <BlackItem 
+                <div className="flex items-center justify-center gap-4 mx-auto max-w-screen-xl w-11/12 my-2">
+                <p className="text-xl text-gray-300 font-bold min-w-8 text-center">{index+1}</p>
+                {row ? 
+                <BlackItem 
                     key={index} 
                     mapId={row.beatmapId} 
                     mapName={row.t} 
                     mapArtist={row.a} 
                     mapper={row.m} /> : 
-                <SkeletonItem key={index} type="blacklist"/>)}
+                <SkeletonItem key={index} type="blacklist"/>}
+                </div>)}
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}
         </div>
     </div>

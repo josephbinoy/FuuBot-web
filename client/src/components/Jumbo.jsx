@@ -8,11 +8,11 @@ export default function Jumbo() {
     const { currentTable, setcurrentTable } = useTable();
     return (
         <div className=" relative mx-auto max-w-screen-xl flex items-center justify-between h-44">
-            <div className="flex items-center justify-center pl-10 pr-5 gap-14">
+            <div className="flex items-end justify-center pl-10 pr-5 gap-12">
                 <h1 className="text-5xl text-gray-300 font-black">Popular<br />Beatmaps</h1>
-                <div className="flex flex-col items-start gap-2 text-osuslate-50">
+                <div className="flex flex-col items-start gap-2 text-osuslate-50 opacity-80 mb-2">
                     <p>Maps are ranked based on in-game pick count. If a map crosses set limits, it will be rejected in-game</p>
-                    <div className="flex items-center justify-center gap-8">
+                    <div className="flex items-center justify-center gap-8 font-bold">
                         <p className="flex items-center gap-1"><span className="inline-block min-h-6 min-w-2 bg-green-500 rounded-sm" /><EqualsIcon className="h-4 w-4" strokeWidth={3} />Safe</p>
                         <p className="flex items-center gap-1"><span className="inline-block min-h-6 min-w-2 bg-orange-500 rounded-sm" /><EqualsIcon className="h-4 w-4" strokeWidth={3} />Near limit</p>
                         <p className="flex items-center gap-1"><span className="inline-block min-h-6 min-w-2 bg-red-500 rounded-sm" /><EqualsIcon className="h-4 w-4" strokeWidth={3} />Rejected</p>
