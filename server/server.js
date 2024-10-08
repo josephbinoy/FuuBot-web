@@ -168,10 +168,10 @@ function showStats(){
     SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
     FROM PICKS;`
     const row = memClient.prepare(query).get();
-    logger.info(`All-time count: ${row.alltime_count}`);
     logger.info(`Weekly count: ${row.weekly_count}`);
     logger.info(`Monthly count: ${row.monthly_count}`);
     logger.info(`Yearly count: ${row.yearly_count}`);
+    logger.info(`All-time count: ${row.alltime_count}`);
 }
 
 async function setAlltimeLimits(){
