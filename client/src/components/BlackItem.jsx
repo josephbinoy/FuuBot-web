@@ -15,10 +15,10 @@ export default function BlackItem({mapId, mapName, mapArtist, mapper, weeklyCoun
             </div>
           </div>
           {alltimeCount !== 0 && <div className='flex items-center justify-center divide-x-1 divide-gray-300 divide-opacity-30'>
-            <p className={'z-10 pointer-events-none w-12 h-10 flex items-center justify-center'}>{weeklyCount}</p>
-            <p className={'z-10 pointer-events-none w-12 h-10 flex items-center justify-center'}>{monthlyCount}</p>
-            <p className={'z-10 pointer-events-none w-12 h-10 flex items-center justify-center'}>{yearlyCount}</p>
-            <p className={'z-10 pointer-events-none w-12 h-10 flex items-center justify-center'}>{alltimeCount}</p>
+            <p className={'relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center'}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>W</span>{weeklyCount}</p>
+            <p className={'relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center'}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>M</span>{monthlyCount}</p>
+            <p className={'relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center'}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>Y</span>{yearlyCount}</p>
+            <p className={'relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center'}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>A</span>{alltimeCount}</p>
           </div>}
         </div>
       </a>

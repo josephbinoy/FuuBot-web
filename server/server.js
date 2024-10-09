@@ -24,6 +24,10 @@ let lastUpdateTimestamp = 0;
 let isDeletingCache = false;
 let blacklist = new Set();
 let bearerToken = '';
+let weeklyLimit = Number(process.env.WEEKLY_LIMIT) || 999;
+let monthlyLimit = Number(process.env.MONTHLY_LIMIT) || 999;
+let yearlyLimit = Number(process.env.YEARLY_LIMIT) || 999;
+let alltimeLimit = Number(process.env.ALLTIME_LIMIT) || 999;
 
 async function updateAndHydrate(newRows) {
     updateMemoryDb(memClient, newRows);
@@ -124,7 +128,7 @@ function getSideboardQuery(type) {
             FROM PICKS
             WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${process.env.WEEKLY_LIMIT}
+            HAVING COUNT(*) >= ${weeklyLimit}
 
             UNION
 
@@ -132,7 +136,7 @@ function getSideboardQuery(type) {
             FROM PICKS
             WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400)
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${process.env.MONTHLY_LIMIT}
+            HAVING COUNT(*) >= ${monthlyLimit}
 
             UNION
 
@@ -140,14 +144,14 @@ function getSideboardQuery(type) {
             FROM PICKS
             WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400)
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${process.env.YEARLY_LIMIT}
+            HAVING COUNT(*) >= ${yearlyLimit}
 
             UNION
 
             SELECT BEATMAP_ID
             FROM PICKS
             GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${process.env.ALLTIME_LIMIT}
+            HAVING COUNT(*) >= ${alltimeLimit}
         )
         )
 
@@ -161,12 +165,7 @@ function getSideboardQuery(type) {
 }
 
 function showStats(){
-    const query = `
-    SELECT COUNT(*) as alltime_count,
-    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
-    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
-    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
-    FROM PICKS;`
+    const query = getStatQuery();
     const row = memClient.prepare(query).get();
     logger.info(`Weekly count: ${row.weekly_count}`);
     logger.info(`Monthly count: ${row.monthly_count}`);
@@ -174,21 +173,47 @@ function showStats(){
     logger.info(`All-time count: ${row.alltime_count}`);
 }
 
-async function setAlltimeLimits(){
-    const query = `
-    SELECT BEATMAP_ID, COUNT(*) as alltime_count
-    FROM PICKS
-    GROUP BY BEATMAP_ID
-    ORDER BY alltime_count DESC
-    LIMIT 1 OFFSET 100;`
-    const row = memClient.prepare(query).get();
-    if (row.alltime_count) {
-        process.env.ALLTIME_LIMIT = row.alltime_count;
-        await deleteCache(redisCache);
-        logger.info(`Set New Alltime Limit: ${row.alltime_count}`);
-    }
-    else {
-        logger.error('Error calculating new alltime limit');
+function getStatQuery(){
+    return `
+    SELECT COUNT(*) as alltime_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+    FROM PICKS;`
+}
+
+function setLimits(){
+    try {
+        const query1 = `
+        SELECT BEATMAP_ID, COUNT(*) as alltime_count
+        FROM PICKS
+        GROUP BY BEATMAP_ID
+        ORDER BY alltime_count DESC
+        LIMIT 1 OFFSET 100;`
+        const row = memClient.prepare(query1).get();
+        const query2 = `SELECT SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+            SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+            SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+            FROM PICKS;`
+        const counts = memClient.prepare(query2).get();
+            if (counts.weekly_count !== undefined){
+                weeklyLimit = Math.floor(counts.weekly_count / 7 * 0.015);
+                logger.info(`Set New Weekly Limit: ${weeklyLimit}`);
+            }
+            if (counts.monthly_count !== undefined){
+                monthlyLimit = Math.floor(counts.monthly_count / 30 * 0.03);
+                logger.info(`Set New Monthly Limit: ${monthlyLimit}`);
+            }
+            if (counts.yearly_count !== undefined){
+                yearlyLimit = Math.floor(counts.yearly_count / 365 * 0.4);
+                logger.info(`Set New Yearly Limit: ${yearlyLimit}`);
+            }
+            if(row.alltime_count !== undefined){
+                alltimeLimit = row.alltime_count;
+                logger.info(`Set New Alltime Limit: ${alltimeLimit}`);
+        }
+    } catch (error) {
+        logger.error('Error setting limits:', error);
     }
 }
 
@@ -229,6 +254,7 @@ async function main(){
     } catch (error) {
         logger.error('Error reading blacklist:', error);
     }
+    setLimits();
     app.get('/api/dbv', (req, res) => {
         res.json({ dbv: lastUpdateTimestamp });
     });
@@ -380,6 +406,28 @@ async function main(){
         }
     });
 
+    app.get('/api/pickcounts', async (req, res) => {
+        const cacheKey = `fuubot:cache-pickcounts`;   
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {                  
+                    res.json(JSON.parse(cachedResult));
+                    return;
+                }
+            }
+            const query = getStatQuery();
+            const counts = memClient.prepare(query).get();
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(counts));
+            }        
+            res.json(counts);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
     app.post('/api/update', async (req, res, next) => {
         const allowedHosts = ['127.0.0.1', '::1', 'localhost'];
         const requestHost = req.hostname;
@@ -410,32 +458,19 @@ async function main(){
             }
         });
 
-    app.get('/api/limits', async (req, res, next) => {
-        const allowedHosts = ['127.0.0.1', '::1', 'localhost'];
-        const requestHost = req.hostname;
-
-        if (!requestHost) {
-            return res.status(400).send('Bad Request');
+    app.get('/api/limits', async (req, res) => {
+        try{
+            res.json({
+                weeklyLimit: weeklyLimit,
+                monthlyLimit: monthlyLimit,
+                yearlyLimit: yearlyLimit,
+                alltimeLimit: alltimeLimit
+            });
+        } catch (error) {
+            logger.error('Error sending limit:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
         }
-        
-        if (!allowedHosts.includes(requestHost)) {
-            return res.status(403).send('Forbidden');
-        }
-        next();
-        }, async (req, res) => {
-            try{
-                const limit = Number(process.env.ALLTIME_LIMIT);
-                if (!isNaN(limit)) {
-                    res.json(limit);
-                }
-                else {
-                    res.status(500).json({ error: 'ALLTIME_LIMIT is not a number' });
-                }
-            } catch (error) {
-                logger.error('Error sending limit:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
-            }
-        });
+    });
 
     app.get('/api/leaderboard/:period', async (req, res) => {
         const { period } = req.params;
@@ -649,8 +684,9 @@ rl.on('line', async (input) => {
     if (input.trim().toLowerCase() === 'stats') {
         showStats();
     }
-    if (input.trim().toLowerCase() === 'update limit') {
-        setAlltimeLimits();
+    if (input.trim().toLowerCase() === 'update limits') {
+        await deleteCache(redisCache);
+        setLimits();
     }
 });
 
