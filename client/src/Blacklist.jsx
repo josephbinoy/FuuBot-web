@@ -38,7 +38,7 @@ export default function Blacklist() {
             <Link to="/" className="absolute top-0 left-0 mt-3 text-lg text-osuslate-100 font-bold flex items-center opacity-70">
                 <ChevronLeftIcon className="opacity-80 h-5 w-5 mr-1" strokeWidth={3} />Back
             </Link>
-            <h1 className="text-5xl text-gray-300 font-black px-10 mt-7">Blacklisted Beatmaps</h1>
+            <h1 className="text-5xl text-gray-300 font-black px-12 mt-7">Blacklisted Beatmaps</h1>
         </div>
         <div className="flex flex-col">
             {rows.map((row, index) => 

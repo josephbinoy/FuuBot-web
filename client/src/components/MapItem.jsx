@@ -37,7 +37,7 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, weeklyCount=
                 }}
             />
             <div className="w-6/12 flex flex-col gap-1 z-10 pointer-events-none">
-              <h2 className="truncate w-full">{mapName}</h2>
+              <h2 className="truncate max-w-[500px]">{mapName}</h2>
               <div className="text-xs flex items-center w-full">
                 <p className="truncate">{mapArtist} •<span className="text-gray-500"> Mapped by {mapper}</span></p>
               </div>
