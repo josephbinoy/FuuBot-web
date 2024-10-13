@@ -22,7 +22,7 @@ function NavList() {
       </NavLink>
       <Popover placement="bottom" offset={-32} >
         <PopoverHandler>
-          <NavLink to={"#"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
+          <NavLink to={"#"} className='p-1 font-extrabold font-visby text-2xl' >
               About
           </NavLink>
         </PopoverHandler>
