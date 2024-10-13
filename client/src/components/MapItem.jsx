@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTable } from '../context/TableProvider.jsx';
 
-export default function MapItem({mapId, mapName, mapArtist, mapper, weeklyCount=0, monthlyCount=0, yearlyCount=0, alltimeCount=0}) {
+export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, weeklyCount=0, monthlyCount=0, yearlyCount=0, alltimeCount=0}) {
   const { pickLimits } = useTable();
   const weeklyLimit = pickLimits.weeklyLimit;
   const monthlyLimit = pickLimits.monthlyLimit;
@@ -43,10 +43,10 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, weeklyCount=
               </div>
             </div>
             <div className='flex items-center justify-center divide-x-1 divide-gray-300 divide-opacity-30'>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(weeklyCount, weeklyLimit)}`}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>W</span>{weeklyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(monthlyCount, monthlyLimit)}`}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>M</span>{monthlyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(yearlyCount, yearlyLimit)}`}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>Y</span>{yearlyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(alltimeCount, alltimeLimit)}`}><span className='text-2xs absolute -top-1 text-gray-300 opacity-70'>A</span>{alltimeCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(weeklyCount, weeklyLimit)} ${tableType==='weekly'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='weekly'?'':'opacity-70'}`}>W</span>{weeklyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(monthlyCount, monthlyLimit)} ${tableType==='monthly'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='monthly'?'':'opacity-70'}`}>M</span>{monthlyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(yearlyCount, yearlyLimit)} ${tableType==='yearly'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='yearly'?'':'opacity-70'}`}>Y</span>{yearlyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(alltimeCount, alltimeLimit)} ${tableType==='alltime'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='alltime'?'':'opacity-70'}`}>A</span>{alltimeCount}</p>
             </div>
         </div>
       </Link>

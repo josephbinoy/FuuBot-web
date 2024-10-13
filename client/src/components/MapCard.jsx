@@ -18,7 +18,7 @@ export default function MapCard({mapId, mapName, mapArtist, mapper, mapperId, fa
         <a href={`https://osu.ppy.sh/beatmapsets/${mapId}`}><ArrowTopRightOnSquareIcon height={25} width={25} className="absolute bottom-3 right-3 text-gray-500" /></a>
         <div className="z-10 w-6/12 flex flex-col items-start justify-between">
             <div className="text-gray-300">
-                <h1 className="text-4xl truncate font-extrabold">{mapName}</h1>
+                <h1 className="text-4xl truncate font-extrabold max-w-[900px]">{mapName}</h1>
                 <h2 className="text-lg truncate">{mapArtist}</h2>
                 <div className="flex items-center justify-start">
                     <PlayCircleIcon height={20} width={20} /><p className= "text-sm ml-1 mr-3">{Number(playCount).toLocaleString()}</p>

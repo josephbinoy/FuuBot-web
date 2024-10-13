@@ -67,3 +67,137 @@ export function updateMemoryDb(memClient, newRows){
         sqliteLogger.error("Error updating memory DB", error);
     }
 }
+
+export function getYesterdayLeaderboardQuery(period) {
+    const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
+    
+    return `
+        SELECT PICKER_ID, 
+            SUM(CASE WHEN PICK_DATE < (strftime('%s', 'now', 'start of day', '-1 day', 'utc')) THEN 1 ELSE 0 END) as alltime_pick_count,
+            SUM(CASE WHEN PICK_DATE >= (strftime('%s', 'now', 'start of day', '-8 days', 'utc')) AND PICK_DATE < (strftime('%s', 'now', 'start of day', '-1 day', 'utc')) THEN 1 ELSE 0 END) as weekly_pick_count
+        FROM PICKS 
+        WHERE PICKER_ID != 0
+        GROUP BY PICKER_ID 
+        ORDER BY ${sortColumn} DESC 
+        LIMIT 50`;
+}
+
+export function getStatQuery(){
+    return `
+    SELECT COUNT(*) as alltime_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+    FROM PICKS;`
+}
+
+export function getSideboardQuery(type, weekly, monthly, yearly, alltime) {
+    if (type !== 'unique' && type !== 'overplayed') {
+        return null;
+    }
+    
+    if(type === 'unique'){
+        return `
+        SELECT PICKER_ID, COUNT(*) as PICK_COUNT
+        FROM PICKS
+        WHERE BEATMAP_ID IN (
+            SELECT BEATMAP_ID
+            FROM PICKS
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) = 1
+        )
+        AND PICKER_ID != 0
+        GROUP BY PICKER_ID
+        ORDER BY PICK_COUNT DESC
+        LIMIT 10;`
+    }
+    else{
+        return `
+        WITH OverplayedMaps AS (
+        SELECT DISTINCT BEATMAP_ID, PICKER_ID 
+        FROM PICKS 
+        WHERE BEATMAP_ID IN (
+            SELECT BEATMAP_ID
+            FROM PICKS
+            WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) >= ${weekly}
+
+            UNION
+
+            SELECT BEATMAP_ID
+            FROM PICKS
+            WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400)
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) >= ${monthly}
+
+            UNION
+
+            SELECT BEATMAP_ID
+            FROM PICKS
+            WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400)
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) >= ${yearly}
+
+            UNION
+
+            SELECT BEATMAP_ID
+            FROM PICKS
+            GROUP BY BEATMAP_ID
+            HAVING COUNT(*) >= ${alltime}
+        )
+        )
+
+        SELECT PICKER_ID, COUNT(*) AS PICK_COUNT
+        FROM OverplayedMaps
+        WHERE PICKER_ID != 0
+        GROUP BY PICKER_ID
+        ORDER BY PICK_COUNT DESC
+        LIMIT 10;`
+    }
+}
+
+export function getLeaderboardQuery(period) {
+    const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
+    
+    return `
+        SELECT PICKER_ID, 
+            COUNT(*) as alltime_pick_count,
+            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_pick_count
+        FROM PICKS
+        WHERE PICKER_ID != 0
+        GROUP BY PICKER_ID 
+        ORDER BY ${sortColumn} DESC 
+        LIMIT 50`;
+}
+
+export function getBeatmapQuery(period) {
+    let orderBy = '';
+    switch (period) {
+        case 'weekly':
+            orderBy = 'weekly_count';
+            break;
+        case 'monthly':
+            orderBy = 'monthly_count';
+            break;
+        case 'yearly':
+            orderBy = 'yearly_count';
+            break;
+        case 'alltime':
+            orderBy = 'alltime_count';
+            break;
+        default:
+            return '';
+    }
+    return `
+    SELECT BEATMAP_ID, 
+           COUNT(*) as alltime_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+    FROM PICKS
+    GROUP BY BEATMAP_ID
+    ORDER BY ${orderBy} DESC 
+    LIMIT (?) 
+    OFFSET (?)`;
+}

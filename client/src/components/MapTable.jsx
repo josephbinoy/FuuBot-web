@@ -107,6 +107,7 @@ export default function MapTable( { tableType }) {
                     mapName={row.t} 
                     mapArtist={row.a} 
                     mapper={row.m} 
+                    tableType={tableType}
                     weeklyCount={row.weekly_count}
                     monthlyCount={row.monthly_count}
                     yearlyCount={row.yearly_count}

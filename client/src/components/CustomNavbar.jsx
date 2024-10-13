@@ -4,6 +4,9 @@ import {
   Collapse,
   Typography,
   IconButton,
+  Popover,
+  PopoverHandler,
+  PopoverContent
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavLink, Link } from "react-router-dom";
@@ -17,6 +20,20 @@ function NavList() {
       <NavLink to={"/players"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
           Players
       </NavLink>
+      <Popover placement="bottom" offset={-32} >
+        <PopoverHandler>
+          <NavLink to={"/about"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
+              About
+          </NavLink>
+        </PopoverHandler>
+        <PopoverContent className="z-[999] overflow-hidden p-0"> 
+          <div className="h-28 w-28">
+            <img
+              src="https://media1.tenor.com/m/lYbTKdA7da4AAAAC/40hara-kinako.gif"
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
     </ul>
   );
 }

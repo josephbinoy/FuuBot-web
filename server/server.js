@@ -1,12 +1,30 @@
 import express from "express";
 import 'dotenv/config'
-import { getMemoryClient, backupFuuBotDb, vacuumBackup, loadFromBackup, updateMemoryDb } from "./utils/dbHelpers.js";
-import { getRedisCacheClient, getRedisMetaClient, hydrateRedisFromBackup, hydrateRedis, hydrateRedisFromBlacklist, deleteCache, getGuestToken, refreshPlayerData } from "./utils/redisHelpers.js";
+import { getMemoryClient, 
+    backupFuuBotDb, 
+    vacuumBackup, 
+    loadFromBackup, 
+    updateMemoryDb,
+    getYesterdayLeaderboardQuery,
+    getStatQuery,
+    getSideboardQuery,
+    getLeaderboardQuery,
+    getBeatmapQuery } from "./utils/dbHelpers.js";
+import { 
+    getRedisCacheClient, 
+    getRedisMetaClient, 
+    hydrateRedisFromBackup, 
+    hydrateRedis, 
+    hydrateRedisFromBlacklist, 
+    deleteCache, 
+    getGuestToken, 
+    refreshPlayerData } from "./utils/redisHelpers.js";
 import UpdateQueue from "./utils/UpdateQueue.js";
 import { logger } from "./utils/Logger.js";
 import { addCleanupListener, exitAfterCleanup } from "async-cleanup";
 import readline from 'readline';
 import { promises as fs } from 'fs';
+import cron from 'node-cron';
 
 const app = express();
 app.use(express.json());
@@ -52,117 +70,6 @@ async function updateBlacklist(){
     }
 }
 
-function getBeatmapQuery(period) {
-    let orderBy = '';
-    switch (period) {
-        case 'weekly':
-            orderBy = 'weekly_count';
-            break;
-        case 'monthly':
-            orderBy = 'monthly_count';
-            break;
-        case 'yearly':
-            orderBy = 'yearly_count';
-            break;
-        case 'alltime':
-            orderBy = 'alltime_count';
-            break;
-        default:
-            return '';
-    }
-    return `
-    SELECT BEATMAP_ID, 
-           COUNT(*) as alltime_count,
-           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
-           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
-           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
-    FROM PICKS
-    GROUP BY BEATMAP_ID
-    ORDER BY ${orderBy} DESC 
-    LIMIT (?) 
-    OFFSET (?)`;
-}
-
-function getLeaderboardQuery(period) {
-    const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
-    
-    return `
-        SELECT PICKER_ID, 
-            COUNT(*) as alltime_pick_count,
-            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_pick_count
-        FROM PICKS
-        WHERE PICKER_ID != 0
-        GROUP BY PICKER_ID 
-        ORDER BY ${sortColumn} DESC 
-        LIMIT 50`;
-}
-
-
-function getSideboardQuery(type) {
-    if (type !== 'unique' && type !== 'overplayed') {
-        return null;
-    }
-    
-    if(type === 'unique'){
-        return `
-        SELECT PICKER_ID, COUNT(*) as PICK_COUNT
-        FROM PICKS
-        WHERE BEATMAP_ID IN (
-            SELECT BEATMAP_ID
-            FROM PICKS
-            GROUP BY BEATMAP_ID
-            HAVING COUNT(*) = 1
-        )
-        AND PICKER_ID != 0
-        GROUP BY PICKER_ID
-        ORDER BY PICK_COUNT DESC
-        LIMIT 10;`
-    }
-    else{
-        return `
-        WITH OverplayedMaps AS (
-        SELECT DISTINCT BEATMAP_ID, PICKER_ID 
-        FROM PICKS 
-        WHERE BEATMAP_ID IN (
-            SELECT BEATMAP_ID
-            FROM PICKS
-            WHERE PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
-            GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${weeklyLimit}
-
-            UNION
-
-            SELECT BEATMAP_ID
-            FROM PICKS
-            WHERE PICK_DATE > (strftime('%s', 'now') - 30 * 86400)
-            GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${monthlyLimit}
-
-            UNION
-
-            SELECT BEATMAP_ID
-            FROM PICKS
-            WHERE PICK_DATE > (strftime('%s', 'now') - 365 * 86400)
-            GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${yearlyLimit}
-
-            UNION
-
-            SELECT BEATMAP_ID
-            FROM PICKS
-            GROUP BY BEATMAP_ID
-            HAVING COUNT(*) >= ${alltimeLimit}
-        )
-        )
-
-        SELECT PICKER_ID, COUNT(*) AS PICK_COUNT
-        FROM OverplayedMaps
-        WHERE PICKER_ID != 0
-        GROUP BY PICKER_ID
-        ORDER BY PICK_COUNT DESC
-        LIMIT 10;`
-    }
-}
 
 function showStats(){
     const query = getStatQuery();
@@ -171,15 +78,6 @@ function showStats(){
     logger.info(`Monthly count: ${row.monthly_count}`);
     logger.info(`Yearly count: ${row.yearly_count}`);
     logger.info(`All-time count: ${row.alltime_count}`);
-}
-
-function getStatQuery(){
-    return `
-    SELECT COUNT(*) as alltime_count,
-    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
-    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
-    SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
-    FROM PICKS;`
 }
 
 function setLimits(){
@@ -191,44 +89,38 @@ function setLimits(){
         ORDER BY alltime_count DESC
         LIMIT 1 OFFSET 100;`
         const row = memClient.prepare(query1).get();
-        const query2 = `SELECT SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
-            SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+        const query2 = `SELECT SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
             SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
             FROM PICKS;`
         const counts = memClient.prepare(query2).get();
-            if (counts.weekly_count !== undefined){
-                weeklyLimit = Math.floor(counts.weekly_count / 7 * 0.015);
-                logger.info(`Set New Weekly Limit: ${weeklyLimit}`);
-            }
-            if (counts.monthly_count !== undefined){
-                monthlyLimit = Math.floor(counts.monthly_count / 30 * 0.03);
-                logger.info(`Set New Monthly Limit: ${monthlyLimit}`);
-            }
-            if (counts.yearly_count !== undefined){
-                yearlyLimit = Math.floor(counts.yearly_count / 365 * 0.4);
-                logger.info(`Set New Yearly Limit: ${yearlyLimit}`);
-            }
-            if(row.alltime_count !== undefined){
-                alltimeLimit = row.alltime_count;
-                logger.info(`Set New Alltime Limit: ${alltimeLimit}`);
+        if (counts.monthly_count !== undefined){
+            monthlyLimit = Math.floor(counts.monthly_count / 30 * 0.03);
+            logger.info(`Set New Monthly Limit: ${monthlyLimit}`);
+        }
+        if (counts.yearly_count !== undefined){
+            yearlyLimit = Math.floor(counts.yearly_count / 365 * 0.4);
+            logger.info(`Set New Yearly Limit: ${yearlyLimit}`);
+        }
+        if (row.alltime_count !== undefined) {
+            alltimeLimit = row.alltime_count;
+            logger.info(`Set New Alltime Limit: ${alltimeLimit}`);
         }
     } catch (error) {
         logger.error('Error setting limits:', error);
     }
 }
 
-function getYesterdayLeaderboardQuery(period) {
-    const sortColumn = period === 'weekly' ? 'weekly_pick_count' : 'alltime_pick_count';
-    
-    return `
-        SELECT PICKER_ID, 
-            SUM(CASE WHEN PICK_DATE < (strftime('%s', 'now', 'start of day', '-1 day', 'utc')) THEN 1 ELSE 0 END) as alltime_pick_count,
-            SUM(CASE WHEN PICK_DATE >= (strftime('%s', 'now', 'start of day', '-8 days', 'utc')) AND PICK_DATE < (strftime('%s', 'now', 'start of day', '-1 day', 'utc')) THEN 1 ELSE 0 END) as weekly_pick_count
-        FROM PICKS 
-        WHERE PICKER_ID != 0
-        GROUP BY PICKER_ID 
-        ORDER BY ${sortColumn} DESC 
-        LIMIT 50`;
+function setWeeklyLimits(){
+    try {
+        const query2 = `SELECT SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count FROM PICKS;`
+        const counts = memClient.prepare(query2).get();
+        if (counts.weekly_count !== undefined){
+            weeklyLimit = Math.floor(counts.weekly_count / 7 * 0.015);
+            logger.info(`Set New Weekly Limit: ${weeklyLimit}`);
+        }
+    } catch (error) {
+        logger.error('Error setting weekly limit: ', error);
+    }
 }
 
 async function getBlacklist() {
@@ -255,6 +147,26 @@ async function main(){
         logger.error('Error reading blacklist:', error);
     }
     setLimits();
+    setWeeklyLimits();
+    cron.schedule('0 0 * * *', () => {
+        logger.info('Updating weekly limits');
+        setWeeklyLimits();
+        }, {
+        scheduled: true,
+        timezone: "UTC"
+    });
+        
+    logger.info('Scheduled Cron Job to update weekly limits daily (everyday at 00:00 UTC)');
+        
+    cron.schedule('0 0 * * 0', () => {
+        logger.info('Updating other limits');
+        setLimits();
+        }, {
+        scheduled: true,
+        timezone: "UTC"
+    });
+    
+    logger.info('Scheduled Cron Job to update other limits weekly (every Sunday 00:00 UTC)');
     app.get('/api/dbv', (req, res) => {
         res.json({ dbv: lastUpdateTimestamp });
     });
@@ -530,7 +442,7 @@ async function main(){
                     return;
                 }
             }
-            const query = getSideboardQuery(type);
+            const query = getSideboardQuery(type, weeklyLimit, monthlyLimit, yearlyLimit, alltimeLimit);
             if (!query) {
                 res.status(400).json({ error: 'Invalid parameters' });
             }
@@ -687,6 +599,7 @@ rl.on('line', async (input) => {
     if (input.trim().toLowerCase() === 'update limits') {
         await deleteCache(redisCache);
         setLimits();
+        setWeeklyLimits();
     }
 });
 
