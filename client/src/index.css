@@ -39,14 +39,20 @@
 .chart_tooltip {
     font-family: 'VisbyRoundCF', sans-serif;
     background-color: #303241;
-    border-color: black;
-    opacity: 1;
     color: #d1d5db;
     padding: 5px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.chart_tooltip .first{
+    color: #eded8a;
+}
+
+.chart_tooltip .second{
+    color: #f09c78;
 }
 
 .apexcharts-tooltip {

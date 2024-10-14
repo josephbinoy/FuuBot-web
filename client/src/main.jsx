@@ -5,6 +5,7 @@ import Beatmaps from "./Beatmaps";
 import Blacklist from "./Blacklist";
 import History from "./History";
 import Players from "./Players";
+import About from "./About";
 import Profile from "./Profile";
 import "./index.css";
  
@@ -136,7 +137,11 @@ const router = createBrowserRouter([
   {
     path: "profile/:playerId",
     element: (<Profile />),
-  }
+  },
+  {
+    path: "about",
+    element: (<About />),
+  },
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider value={theme}>

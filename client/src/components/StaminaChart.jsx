@@ -9,8 +9,12 @@ import {
     height: 400,
     series: [
       {
-        name: "Stamina Limit",
-        data: [9.31, 6.65, 6.59, 6.52, 6.30, 5.85, 4.52],
+        name: "‎ 4.5 - 6* Lobby‎ ‎ ‎ ",
+        data: [7.49, 5.35, 5.30, 5.24, 5.17, 5.06, 4.92, 4.71, 4.35, 3.64],
+      },
+      {
+        name: "‎ 5 - 6.5* Lobby",
+        data: [9.31, 6.65, 6.59, 6.52, 6.42, 6.30, 6.12, 5.85, 5.4, 4.52],
       },
     ],
     options: {
@@ -19,16 +23,22 @@ import {
           show: false,
         },
       },
-      dataLabels: {
-        enabled: false,
-        style: {
-          colors: ["#232732"],
+      legend: {
+        color: "#d1d5db",
+        fontSize: '14px',
+        fontFamily: 'inherit',
+        fontWeight: 600,
+        labels: {
+          useSeriesColors: true
+        },
+        onItemClick: {
+          toggleDataSeries: false
         },
       },
-      colors: ["#eaeac2"],
+      colors: ["#eded8a", "#f09c78"],
       stroke: {
         lineCap: "round",
-        curve: "smooth",
+        curve: "monotoneCubic",
       },
       markers: {
         size: 0,
@@ -53,8 +63,11 @@ import {
           "2",
           "3",
           "4",
+          "5",
           "6",
+          "7",
           "8",
+          "9",
           "10"
         ],
         tooltip: {
@@ -116,24 +129,23 @@ import {
       tooltip: {
         theme: false,
         custom: function({series, seriesIndex, dataPointIndex, w}) {
-            return '<div class="chart_tooltip">' +
-                '<span>Stamina Limit</span>' +
-                '<span>' + series[seriesIndex][dataPointIndex] + ' CPS </span>' +
-                '</div>'
-            }
-        },
-        marker: {
-        show: false,
-        },
-        dropShadow: {
-            enabled: false
+          const firstObjectCount=Math.floor(series[1][dataPointIndex]*(dataPointIndex+1)*60);
+          const secondObjectCount=Math.floor(series[0][dataPointIndex]*(dataPointIndex+1)*60);
+          return `
+            <div class="chart_tooltip">
+              <p>Stamina Limit (${dataPointIndex+1} min)</p>
+              <p><span class="second">${series[1][dataPointIndex]} CPS (${firstObjectCount} objects)</span></p>
+              <p><span class="first">${series[0][dataPointIndex]} CPS (${secondObjectCount} objects)</span></p>
+            </div>
+          `;
+          }
         }
     },
   };
    
   export default function StaminaChart() {
     return (
-      <Card className="w-8/12 mx-auto">
+      <Card className="w-8/12 mx-auto my-10">
         <CardBody className="px-7 pb-0 bg-osuslate-800">
           <Chart {...chartConfig} />
         </CardBody>
