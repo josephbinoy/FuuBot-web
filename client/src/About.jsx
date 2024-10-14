@@ -1,8 +1,16 @@
 import CustomNavbar from "./components/CustomNavbar"
 import StaminaChart from "./components/StaminaChart";
-import { Link } from "react-router-dom";
+import { Link, useLocation} from "react-router-dom";
+import { useEffect, useRef } from "react";
 
 export default function About() {
+    const location = useLocation();
+    const staminaRef = useRef(null);
+    useEffect(() => {
+        if(location.hash === "#stamina") {
+            staminaRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [location]);
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
         <CustomNavbar />
@@ -21,11 +29,11 @@ export default function About() {
                 <li>Lobbies being filled with low rank players who pick low quality maps (not surprising considering there are roughly 18 million osu! accounts).</li>
             </ul>
         </div>
-        <div className="flex flex-col mx-auto max-w-screen-xl px-10 my-10 text-gray-300 text-xl leading-relaxed" id="stamina">
+        <div ref={staminaRef} className="flex flex-col mx-auto max-w-screen-xl px-10 my-10 text-gray-300 text-xl leading-relaxed" id="stamina">
             <h2 className="text-3xl font-black mb-5">Stamina Limit?</h2>
             <p className="indent-10">Stamina is measured in <span className="text-glow-100">Circles Per Second or CPS</span> (technically Objects Per Second). We limit those maps that have a vey high CPS (mostly stream maps and maps with high note density)</p>
             <br />
-            <p >Use the interactive chart to check the stamina limit and maximum allowed object count based on map length: </p>
+            <p className="underline underline-offset-4">Use the interactive chart to check the stamina limit and maximum allowed object count based on map length: </p>
             <StaminaChart />
         </div>
         <div className="flex flex-col mx-auto max-w-screen-xl px-10 text-gray-300 text-xl leading-relaxed" id="formula">
