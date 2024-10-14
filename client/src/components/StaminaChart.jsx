@@ -3,6 +3,11 @@ import {
     CardBody
   } from "@material-tailwind/react";
   import Chart from "react-apexcharts";
+
+  const labels = [
+    "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5",
+    "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10"
+  ]
    
   const chartConfig = {
     type: "line",
@@ -10,11 +15,11 @@ import {
     series: [
       {
         name: "‎ 4.5 - 6* Lobby‎ ‎ ‎ ",
-        data: [7.49, 5.35, 5.30, 5.24, 5.17, 5.06, 4.92, 4.71, 4.35, 3.64],
+        data: [7.49, 6.06, 5.35, 5.33, 5.30, 5.28, 5.24, 5.21, 5.17, 5.12, 5.06, 5.00, 4.92, 4.83, 4.71, 4.55, 4.35, 4.07, 3.64],
       },
       {
         name: "‎ 5 - 6.5* Lobby",
-        data: [9.31, 6.65, 6.59, 6.52, 6.42, 6.30, 6.12, 5.85, 5.4, 4.52],
+        data: [9.31, 7.54, 6.65, 6.62, 6.59, 6.56, 6.52, 6.47, 6.42, 6.36, 6.30, 6.22, 6.12, 6.00, 5.85, 5.66, 5.4, 5.05, 4.52],
       },
     ],
     options: {
@@ -57,19 +62,14 @@ import {
             fontFamily: "inherit",
             fontWeight: 600,
           },
+          formatter: function(value) {
+            if (value % 1 === 0)
+              return value;
+            else
+              return "";
+          }
         },
-        categories: [
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10"
-        ],
+        categories: labels,
         tooltip: {
             enabled: false,
         },
@@ -129,11 +129,12 @@ import {
       tooltip: {
         theme: false,
         custom: function({series, seriesIndex, dataPointIndex, w}) {
-          const firstObjectCount=Math.floor(series[1][dataPointIndex]*(dataPointIndex+1)*60);
-          const secondObjectCount=Math.floor(series[0][dataPointIndex]*(dataPointIndex+1)*60);
+          const length = labels[dataPointIndex];       
+          const firstObjectCount=Math.floor(series[1][dataPointIndex]*(length)*60);
+          const secondObjectCount=Math.floor(series[0][dataPointIndex]*(length)*60);
           return `
             <div class="chart_tooltip">
-              <p>Stamina Limit (${dataPointIndex+1} min)</p>
+              <p>Stamina Limit (${length%1==0?length: Math.floor(length)+':30'} min)</p>
               <p><span class="second">${series[1][dataPointIndex]} CPS (${firstObjectCount} objects)</span></p>
               <p><span class="first">${series[0][dataPointIndex]} CPS (${secondObjectCount} objects)</span></p>
             </div>
@@ -145,7 +146,7 @@ import {
    
   export default function StaminaChart() {
     return (
-      <Card className="w-8/12 mx-auto my-10">
+      <Card className="w-10/12 mx-auto my-10">
         <CardBody className="px-7 pb-0 bg-osuslate-800">
           <Chart {...chartConfig} />
         </CardBody>
