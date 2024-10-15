@@ -152,7 +152,6 @@ async function main(){
         logger.info('Updating weekly limits');
         setWeeklyLimits();
         }, {
-        scheduled: true,
         timezone: "UTC"
     });
         
@@ -162,7 +161,6 @@ async function main(){
         logger.info('Updating other limits');
         setLimits();
         }, {
-        scheduled: true,
         timezone: "UTC"
     });
     
