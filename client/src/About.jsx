@@ -2,6 +2,7 @@ import CustomNavbar from "./components/CustomNavbar"
 import StaminaChart from "./components/StaminaChart";
 import { Link, useLocation} from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export default function About() {
     const location = useLocation();
@@ -14,7 +15,12 @@ export default function About() {
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
         <CustomNavbar />
-        <h1 className="text-5xl text-gray-300 font-black px-10 mx-auto max-w-screen-xl my-8">About</h1>
+        <div className="relative mx-auto max-w-screen-xl flex items-center justify-between h-28 ">
+            <Link to="/commands" className="absolute top-0 right-0 mt-2 text-lg text-osuslate-100 font-bold flex items-center opacity-70">
+                View Command List<ChevronRightIcon className="opacity-80 h-5 w-5 mr-1" strokeWidth={3} />
+            </Link>
+            <h1 className="text-5xl text-gray-300 font-black px-10">About</h1>
+        </div>
         <div className="flex flex-col mx-auto max-w-screen-xl px-10 text-gray-300 text-xl leading-relaxed" id="about">
             <h2 className="text-3xl font-black mb-5">What is FuuBot?</h2>
             <p className="text-3xl mx-auto my-8 font-black mb-5 text-transparent bg-clip-text bg-gradient-to-r from-glow-100 to-[#f09c78]">“The bridge between private and public lobby.”</p>
