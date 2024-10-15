@@ -31,7 +31,8 @@ export default withMT({
         '2xs': ['0.65rem', { lineHeight: '1rem' }],
       },
       fontFamily: {
-        visby: ['VisbyRoundCF','Helvetica','sans-serif'],
+        'visby': ['VisbyRoundCF','Helvetica','sans-serif'],
+        'mono': ['monospace'],
       },
       borderRadius: {
         'reg': '0.25rem', 

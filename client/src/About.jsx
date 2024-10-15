@@ -39,7 +39,7 @@ export default function About() {
             <p className="text-sm mx-auto mt-3">how to check object count</p>
             <p className="text-base my-5">Note: We use the map's hit length or drain length in calculations which is total length minus breaks however the difference is usually small</p>
             <img src="hit_length.png" className="w-60 mx-auto"></img>
-            <p className="text-sm mx-auto mt-3">Drain Length</p>
+            <p className="text-sm mx-auto mt-3">drain length</p>
         </div>
         <div className="flex flex-col mx-auto max-w-screen-xl px-10 text-gray-300 text-xl leading-relaxed" id="formula">
             <h2 className="text-3xl font-black mb-5">How is Stamina Limit Calculated?</h2>

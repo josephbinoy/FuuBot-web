@@ -7,6 +7,8 @@ import History from "./History";
 import Players from "./Players";
 import About from "./About";
 import Profile from "./Profile";
+import Commands from "./Commands";
+import ErrorElement from "./ErrorElement";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";
@@ -121,6 +123,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (<Beatmaps />),
+    errorElement: <ErrorElement />,
   },
   {
     path: "blacklist",
@@ -142,13 +145,18 @@ const router = createBrowserRouter([
     path: "about",
     element: (<About />),
   },
+  {
+    path: "commands",
+    element: (<Commands />),
+  },
+  
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider value={theme}>
       <AlertProvider>
         <DbvProvider>
           <TableProvider>
-            <RouterProvider router={router} />
+            <RouterProvider router={router}/>
           </TableProvider>
         </DbvProvider>
       </AlertProvider>
