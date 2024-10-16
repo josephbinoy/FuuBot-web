@@ -14,8 +14,16 @@ Every map picked in the lobby gets its very own history page that shows all the 
 
 ## Players
 
-Displays the different player leaderboards (Top 50 Most Picks for now)
+Displays the different player leaderboards (Top 50 Most Picks, Top 10 Unique Pickers and Top 10 Overplayed Pickers)
 
 ## Profile
 
 Every player gets their very own profile page that shows relevant stats along with their entire pick history
+
+## About 
+
+Contains our objectives explanations for various FAQs
+
+## Commands
+
+Lists all the player and host commands
