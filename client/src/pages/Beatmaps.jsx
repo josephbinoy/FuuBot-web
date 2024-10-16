@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useTable } from "./context/TableProvider";
-import CustomNavbar from "./components/CustomNavbar"
-import Jumbo from "./components/Jumbo"
-import MapTable from "./components/MapTable"
+import { useTable } from "../context/TableProvider";
+import CustomNavbar from "../components/CustomNavbar"
+import Jumbo from "../components/Jumbo"
+import MapTable from "../components/MapTable"
 
 export default function Beatmaps() {
   const { currentTable, setcurrentTable } = useTable();

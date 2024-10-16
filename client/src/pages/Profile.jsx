@@ -1,6 +1,6 @@
-import CustomNavbar from "./components/CustomNavbar"
-import ProfileCard from "./components/ProfileCard"
-import PlayerTable from "./components/PlayerTable";
+import CustomNavbar from "../components/CustomNavbar"
+import ProfileCard from "../components/ProfileCard"
+import PlayerTable from "../components/PlayerTable";
 import { useParams, useNavigate, useLocation} from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 

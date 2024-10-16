@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter,  RouterProvider } from "react-router-dom";
-import Beatmaps from "./Beatmaps";
-import Blacklist from "./Blacklist";
-import History from "./History";
-import Players from "./Players";
-import About from "./About";
-import Profile from "./Profile";
-import Commands from "./Commands";
-import ErrorElement from "./ErrorElement";
+import Beatmaps from "./pages/Beatmaps";
+import Blacklist from "./pages/Blacklist";
+import History from "./pages/History";
+import Players from "./pages/Players";
+import About from "./pages/About";
+import Profile from "./pages/Profile";
+import Commands from "./pages/Commands";
+import ErrorElement from "./pages/ErrorElement";
 import "./index.css";
  
 import { ThemeProvider } from "@material-tailwind/react";

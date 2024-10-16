@@ -1,6 +1,6 @@
-import CustomNavbar from "./components/CustomNavbar"
-import LeaderBoard from "./components/LeaderBoard";
-import SideBoard from "./components/SideBoard";
+import CustomNavbar from "../components/CustomNavbar"
+import LeaderBoard from "../components/LeaderBoard";
+import SideBoard from "../components/SideBoard";
 import { useState } from "react";
 import {
   Tabs,
@@ -14,7 +14,7 @@ export default function History() {
   const [currentLeaderboard, setcurrentLeaderboard] = useState('weekly');
   const [activeTab, setActiveTab] = useState("mostpicks");
   return(
-    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
+    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
         <CustomNavbar />
         <h1 className="mx-auto max-w-screen-xl text-5xl text-gray-300 font-black px-10 my-8">Player Leaderboards</h1>
         <Tabs value={activeTab} className='mx-auto max-w-screen-xl'>

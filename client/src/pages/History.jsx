@@ -1,13 +1,13 @@
-import CustomNavbar from "./components/CustomNavbar"
-import MapCard from "./components/MapCard";
-import PlayerCard from "./components/PlayerCard";
-import SkeletonPlayerCard from "./skeletons/SkeletonPlayerCard";
+import CustomNavbar from "../components/CustomNavbar"
+import MapCard from "../components/MapCard";
+import PlayerCard from "../components/PlayerCard";
+import SkeletonPlayerCard from "../skeletons/SkeletonPlayerCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate, useLocation} from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import SkeletonMapCard from "./skeletons/SkeletonMapCard";
-import { useAlert } from "./context/AlertProvider";
+import SkeletonMapCard from "../skeletons/SkeletonMapCard";
+import { useAlert } from "../context/AlertProvider";
 
 export default function History() {
     const [data, setData] = useState([null, null, null, null, null]);

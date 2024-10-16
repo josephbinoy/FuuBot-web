@@ -1,5 +1,5 @@
-import CustomNavbar from "./components/CustomNavbar"
-import StaminaChart from "./components/StaminaChart";
+import CustomNavbar from "../components/CustomNavbar"
+import StaminaChart from "../components/StaminaChart";
 import { Link, useLocation} from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";

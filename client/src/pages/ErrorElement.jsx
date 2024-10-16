@@ -1,5 +1,5 @@
 import { useRouteError } from "react-router-dom";
-import CustomNavbar from "./components/CustomNavbar";
+import CustomNavbar from "../components/CustomNavbar";
 
 export default function ErrorElement() {
   const error = useRouteError();

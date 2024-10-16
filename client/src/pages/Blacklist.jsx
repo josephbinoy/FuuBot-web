@@ -1,11 +1,11 @@
-import CustomNavbar from "./components/CustomNavbar"
-import BlackItem from "./components/BlackItem"
-import SkeletonItem from "./skeletons/SkeletonItem";
+import CustomNavbar from "../components/CustomNavbar"
+import BlackItem from "../components/BlackItem"
+import SkeletonItem from "../skeletons/SkeletonItem";
 import axios from "axios"
 import { useState, useEffect } from "react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
-import { useAlert } from "./context/AlertProvider";
+import { useAlert } from "../context/AlertProvider";
 
 export default function Blacklist() {
     const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);

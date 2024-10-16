@@ -4,8 +4,8 @@ import {
     TabsBody,
     Tab,
     TabPanel, } from "@material-tailwind/react";
-import CustomNavbar from "./components/CustomNavbar";
-import CommandTable from "./components/CommandTable";
+import CustomNavbar from "../components/CustomNavbar";
+import CommandTable from "../components/CommandTable";
 import { useState } from "react";
  
 const playerCommands = [
@@ -92,7 +92,7 @@ const hostCommands = [
 export default function Commands() {
     const [activeTab, setActiveTab] = useState("player");
   return (
-    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
+    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
         <CustomNavbar />
         <h1 className="mx-auto max-w-screen-xl text-5xl text-gray-300 font-black px-10 my-8">Lobby Commands</h1>
         <Tabs value={activeTab} className='mx-auto max-w-screen-xl'>
