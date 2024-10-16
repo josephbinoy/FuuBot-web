@@ -58,7 +58,7 @@ export default function About() {
         </div>
         <div className="flex flex-col mx-auto max-w-screen-xl px-10 text-gray-300 text-xl my-10 leading-relaxed" id="popular">
           <h2 className="text-3xl font-black mb-5">Why does it ban popular maps?</h2>
-            <p className="indent-10">Simple answer: To <span className="text-glow-100">diversify the multi map pool</span>. There are hundred of thousands of beatmaps out there but players tend to pick the same few maps. By banning popular maps, we encourage players to explore and pick maps they otherwise wouldn't. This gives more exposure to thousands of maps with low play count.</p>
+            <p className="indent-10">Simple answer: To <span className="text-glow-100">diversify the multi map pool</span>. There are hundreds of thousands of beatmaps out there but players tend to pick the same few maps. By banning popular maps, we encourage players to explore and pick maps they otherwise wouldn't. This gives more exposure to thousands of maps with low play count.</p>
             <h2 className="text-3xl font-black mt-10 mb-5">How does it work?</h2>
             <p className="indent-10">We keep track of each and every map a player picks, whether valid or not. You can view the stats on our <Link to="/" className="text-glow-100 underline underline-offset-4 hover:opacity-70">Beatmaps Page</Link>.</p>
             <br />
