@@ -26,7 +26,7 @@ export default function About() {
             <p className="text-3xl mx-auto my-8 font-black mb-5 text-transparent bg-clip-text bg-gradient-to-r from-glow-100 to-[#f09c78]">“The bridge between private and public lobby.”</p>
             <p className="mt-10"><span className="text-glow-100 font-bold opacity-90 text-2xl">FuuBot</span> is a unique osu! auto host rotate bot created by active osu! players in an attempt to improve the multi experience by moderating both players and maps while providing useful features.</p>
             <br />
-            <p className="text-osuslate-50">(Disclaimer: This bot does not cater to everyone by design. The players who have a problem with it are precisely the kind of players we want to keep out.)</p>
+            <p className="text-osuslate-50">(Disclaimer: This bot does not cater to everyone by design. The players who have a problem with it are precisely the kind of players we want to keep out. Multi-holic players probably can appreciate the design of this lobby and the thought that went into it.)</p>
             <br />
             <p>Problems FuuBot aims to solve that exist in every other bot: </p>
             <ul className="list-decimal list-inside indent-8">

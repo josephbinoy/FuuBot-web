@@ -9,7 +9,7 @@ export default function Profile() {
     const navigate = useNavigate();
     const { state } = useLocation();
   return(
-    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
+    <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-scroll">
         <CustomNavbar classes="sticky top-0 z-20"/>
         <div className="sticky top-22 mx-auto max-w-screen-xl flex items-center justify-between h-40 z-30 bg-osuslate-500">
                 <button

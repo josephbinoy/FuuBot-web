@@ -37,14 +37,14 @@ export default function History() {
                   onClick={() => setActiveTab("unique")}
                   className={activeTab === "unique" ? "text-gray-300 -translate-y-px text-2xl font-bold pb-2" : "text-osuslate-100 text-2xl font-bold"}
                 >
-                  Unique Pickers
+                  Unique Picks
                 </Tab>
                 <Tab
                   value="overplayed"
                   onClick={() => setActiveTab("overplayed")}
                   className={activeTab === "overplayed" ? "text-gray-300 -translate-y-px text-2xl font-bold pb-2" : "text-osuslate-100 text-2xl font-bold"}
                 >
-                  Overplayed Pickers
+                  Overplayed Picks
                 </Tab>
             </TabsHeader>
             <TabsBody>
