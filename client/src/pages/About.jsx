@@ -37,7 +37,7 @@ export default function About() {
         </div>
         <div ref={staminaRef} className="flex flex-col mx-auto max-w-screen-xl px-10 my-10 text-gray-300 text-xl leading-relaxed" id="stamina">
             <h2 className="text-3xl font-black mb-5">Stamina Limit?</h2>
-            <p className="indent-10">Stamina is measured in <span className="text-glow-100">Circles Per Second or CPS</span> (technically Objects Per Second). We limit those maps that have a vey high CPS (mostly stream maps and maps with high note density)</p>
+            <p className="indent-10">Stamina is measured in <span className="text-glow-100">Circles Per Second or CPS</span> (technically Objects Per Second). We limit those maps that have a very high CPS (mostly stream maps and maps with high note density)</p>
             <br />
             <p className="underline underline-offset-4">Hover over the chart below to check the stamina limit and maximum object count based on map length: </p>
             <StaminaChart />
