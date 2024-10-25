@@ -80,15 +80,8 @@ function showStats(){
     logger.info(`All-time count: ${row.alltime_count}`);
 }
 
-function setLimits(){
+function setOtherLimits(){
     try {
-        const query1 = `
-        SELECT BEATMAP_ID, COUNT(*) as alltime_count
-        FROM PICKS
-        GROUP BY BEATMAP_ID
-        ORDER BY alltime_count DESC
-        LIMIT 1 OFFSET 100;`
-        const row = memClient.prepare(query1).get();
         const query2 = `SELECT SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
             SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
             FROM PICKS;`
@@ -101,25 +94,32 @@ function setLimits(){
             yearlyLimit = Math.floor(counts.yearly_count / 365 * 0.4);
             logger.info(`Set New Yearly Limit: ${yearlyLimit}`);
         }
-        if (row.alltime_count !== undefined) {
-            alltimeLimit = row.alltime_count;
-            logger.info(`Set New Alltime Limit: ${alltimeLimit}`);
-        }
     } catch (error) {
-        logger.error('Error setting limits:', error);
+        logger.error('Error setting other limits:', error);
     }
 }
 
-function setWeeklyLimits(){
+function setWeeklyAndAlltimeLimits(){
     try {
+        const query1 = `
+        SELECT BEATMAP_ID, COUNT(*) as alltime_count
+        FROM PICKS
+        GROUP BY BEATMAP_ID
+        ORDER BY alltime_count DESC
+        LIMIT 1 OFFSET 100;`
+        const row = memClient.prepare(query1).get();
         const query2 = `SELECT SUM (CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count FROM PICKS;`
         const counts = memClient.prepare(query2).get();
         if (counts.weekly_count !== undefined){
             weeklyLimit = Math.floor(counts.weekly_count / 7 * 0.015);
             logger.info(`Set New Weekly Limit: ${weeklyLimit}`);
         }
+        if (row.alltime_count !== undefined) {
+            alltimeLimit = row.alltime_count;
+            logger.info(`Set New Alltime Limit: ${alltimeLimit}`);
+        }
     } catch (error) {
-        logger.error('Error setting weekly limit: ', error);
+        logger.error('Error setting weekly or alltime limit: ', error);
     }
 }
 
@@ -146,20 +146,20 @@ async function main(){
     } catch (error) {
         logger.error('Error reading blacklist:', error);
     }
-    setLimits();
-    setWeeklyLimits();
+    setOtherLimits();
+    setWeeklyAndAlltimeLimits();
     cron.schedule('0 0 * * *', () => {
-        logger.info('Updating weekly limits');
-        setWeeklyLimits();
+        logger.info('Updating weekly and alltime limits');
+        setWeeklyAndAlltimeLimits();
         }, {
         timezone: "UTC"
     });
         
-    logger.info('Scheduled Cron Job to update weekly limits daily (everyday at 00:00 UTC)');
+    logger.info('Scheduled Cron Job to update weekly and alltime limits daily (everyday at 00:00 UTC)');
         
     cron.schedule('0 0 * * 0', () => {
         logger.info('Updating other limits');
-        setLimits();
+        setOtherLimits();
         }, {
         timezone: "UTC"
     });
@@ -596,8 +596,8 @@ rl.on('line', async (input) => {
     }
     if (input.trim().toLowerCase() === 'update limits') {
         await deleteCache(redisCache);
-        setLimits();
-        setWeeklyLimits();
+        setOtherLimits();
+        setWeeklyAndAlltimeLimits();
     }
 });
 
