@@ -23,29 +23,30 @@ export default function About() {
         </div>
         <div className="flex flex-col mx-auto max-w-screen-xl px-10 text-gray-300 text-xl leading-relaxed" id="about">
             <h2 className="text-3xl font-black mb-5">What is FuuBot?</h2>
-            <p className="text-3xl mx-auto my-8 font-black mb-5 text-transparent bg-clip-text bg-gradient-to-r from-glow-100 to-[#f09c78]">“The bridge between private and public lobby.”</p>
-            <p className="mt-10"><span className="text-glow-100 font-bold opacity-90 text-2xl">FuuBot</span> is a unique osu! auto host rotate bot created by active osu! players in an attempt to improve the multi experience by moderating both players and maps while providing useful features.</p>
+            <p className="text-3xl mx-auto my-8 font-black text-transparent bg-clip-text bg-gradient-to-r from-glow-100 to-[#f09c78]">“The bridge between private and public lobby.”</p>
+            <p className="mt-5"><span className="text-glow-100 font-bold opacity-90 text-2xl">FuuBot</span> is a unique osu! auto host rotate bot created by active osu! players in an attempt to improve the multi experience by moderating both players and maps while providing useful features.</p>
             <br />
-            <p className="text-osuslate-50">(Disclaimer: This bot does not cater to everyone by design. The players who have a problem with it are precisely the kind of players we want to keep out. Multi-holic players probably can appreciate the design of this lobby and the thought that went into it.)</p>
+            <p className="text-osuslate-50">Disclaimer: This bot does not cater to everyone by design. We understand that some players might find the restrictions frustrating, however we cannot please everyone. Multi-holic players can probably appreciate the design of this lobby and the thought that went into it :)</p>
             <br />
             <p>Problems FuuBot aims to solve that exist in every other bot: </p>
             <ul className="list-decimal list-inside indent-8">
                 <li>Players picking the same 100 or so "overplayed" maps</li>
                 <li>Forcing uncomfortable maps whether it be extremely high/low AR, too long, too stamina draining maps. </li>
-                <li>Lobbies being filled with low rank players who pick low quality maps (not surprising considering there are roughly 18 million osu! accounts).</li>
+                <li>Lobbies being filled with low rank players who pick low quality maps.</li>
             </ul>
         </div>
         <div ref={staminaRef} className="flex flex-col mx-auto max-w-screen-xl px-10 my-10 text-gray-300 text-xl leading-relaxed" id="stamina">
             <h2 className="text-3xl font-black mb-5">Stamina Limit?</h2>
             <p className="indent-10">Stamina is measured in <span className="text-glow-100">Circles Per Second or CPS</span> (technically Objects Per Second). We limit those maps that have a very high CPS (mostly stream maps and maps with high note density)</p>
             <br />
-            <p className="underline underline-offset-4">Hover over the chart below to check the stamina limit and maximum object count based on map length: </p>
+            <p className="underline underline-offset-4 mx-auto">Hover over the chart below to check the stamina limit and maximum object count based on map length</p>
             <StaminaChart />
+            <p className="text-sm mx-auto mt-3 mb-10 opacity-80">Stamina Chart</p>
             <img src="stamina_inst.png" alt="stamina instructions" className="w-8/12 mx-auto mt-10" />
-            <p className="text-sm mx-auto mt-3">how to check object count</p>
-            <p className="text-base my-5">Note: We use the map's hit length or drain length in calculations which is total length minus breaks however the difference is usually small</p>
+            <p className="text-sm mx-auto mt-3 mb-10 opacity-80">How to check Object Count</p>
+            <p className="text-base my-5">Note: We use the map's hit length or drain length in calculations which doesn't count break time however the difference is usually small</p>
             <img src="hit_len.png" className="w-60 mx-auto"></img>
-            <p className="text-sm mx-auto mt-3">drain length</p>
+            <p className="text-sm mx-auto mt-3 mb-5 opacity-80">Drain Length</p>
         </div>
         <div className="flex flex-col mx-auto max-w-screen-xl px-10 text-gray-300 text-xl leading-relaxed" id="formula">
             <h2 className="text-3xl font-black mb-5">How is Stamina Limit Calculated?</h2>

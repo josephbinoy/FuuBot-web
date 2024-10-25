@@ -146,8 +146,8 @@ import {
    
   export default function StaminaChart() {
     return (
-      <Card className="w-11/12 mx-auto my-10">
-        <CardBody className="px-7 pb-0 bg-osuslate-800">
+      <Card className="w-11/12 mx-auto mt-10">
+        <CardBody className="px-7 pb-0 bg-osuslate-900 rounded-lg">
           <Chart {...chartConfig} />
         </CardBody>
       </Card>
