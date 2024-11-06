@@ -92,7 +92,7 @@ export default function HistoryTable( { id }) {
         };
     }, []);
     return (
-        <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
+        <div className="flex flex-col gap-4 mx-auto max-w-screen-lg px-10 pb-10">
         {rows.map((row, index) => {
                 let showPickDate = false;
                 let currentPickDate = null;
@@ -108,7 +108,7 @@ export default function HistoryTable( { id }) {
                     previousPickDate = currentPickDate;
                 }
             return row ? 
-            <div key={index} className="mb-4">
+            <div key={index}>
             {showPickDate && (<p className={`text-osuslate-100 pl-12 font-bold pb-4 text-lg ${isFirstGroup ? "mt-2" : "mt-20"}`}>{currentPickDate}</p>
             )}
             <div className="flex items-center justify-between gap-1">
@@ -129,7 +129,7 @@ export default function HistoryTable( { id }) {
             <div className="flex items-center justify-between gap-1" key={index}>
                 <p className="text-2xl text-gray-300 min-w-10 text-center" />
                 <div className="flex-grow">
-                    <SkeletonPlayerCard key={index}/>
+                    <SkeletonPlayerCard key={index} idx={index}/>
                 </div>
             </div>
         })}

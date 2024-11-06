@@ -91,7 +91,7 @@ export default function ProfileCard({ id }) {
                 {playerData.gr ? (
                     <p>#{Number(playerData.gr).toLocaleString()}</p>
                 ) : (
-                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded-md opacity-50' />
+                    <p className='h-4 2xl:h-6 w-24 bg-osuslate-100 animate-pulse rounded-reg 2xl:rounded opacity-50' />
                 )}
             </div>
             <div className='flex items-center justify-between w-full'>

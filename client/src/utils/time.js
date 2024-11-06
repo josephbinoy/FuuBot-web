@@ -34,6 +34,9 @@ export function daysAgo(timestamp) {
 
     const days = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
+    if (days === 0) {
+        return 'Today';
+    }
     return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
