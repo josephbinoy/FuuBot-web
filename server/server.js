@@ -184,39 +184,79 @@ async function main(){
                     return;
                 }
             }
-            const query1 = `
+            const query = `
                 SELECT COUNT(*) AS total_count
                 FROM PICKS
                 WHERE BEATMAP_ID = ?
             `;
-            const countResult = memClient.prepare(query1).get(id);
-            const query2 = `
-                SELECT PICKER_ID, PICK_DATE
-                FROM PICKS 
-                WHERE BEATMAP_ID = ?
-                AND PICK_DATE > (strftime('%s', 'now') - 7 * 86400)
-                ORDER BY PICK_DATE DESC
-            `;
-            const query3 = `
-                SELECT COUNT(*) AS total_count
-                FROM PICKS 
-                WHERE PICKER_ID = ?
-            `;
-
-            const rows = memClient.prepare(query2).all(id);
-            const history = [];
+            const countResult = memClient.prepare(query).get(id);
             const meta = await redisMeta.hGetAll(`fuubot:beatmap-${id}`);
             if (!meta.t) {  
                 res.status(404).json({ error: 'Beatmap not found' });
                 return;
             }
+            const result = { 
+                beatmap: meta, 
+                alltimeCount: countResult.total_count
+            };
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }        
+            res.json(result);
+        } catch (error) {
+            logger.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    app.get('/api/history/players/:id', async (req, res) => {
+        const id = parseInt(req.params.id);
+        const pageNo = parseInt(req.query.pageNo);
+        const dbv = parseInt(req.query.dbv);
+        if (isNaN(dbv) || isNaN(pageNo) || pageNo < 0) {
+            res.status(400).json({ error: 'Invalid parameters' });
+            return;
+        }
+        else if (dbv === -1 && pageNo !== 0) {
+            res.status(409).json({ error: 'Incompatible page requested' });
+            return;
+        }
+        else if (dbv !== -1 && dbv !== lastUpdateTimestamp) {
+            res.status(409).json({ error: 'dbv mismatch' });
+            return;
+        }
+        const cacheKey = `fuubot:cache-history-players-${id}-${pageNo}`;
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {            
+                    res.json(JSON.parse(cachedResult));
+                    return;
+                }
+            }
+            const query = `
+                SELECT PICKER_ID, PICK_DATE 
+                FROM PICKS 
+                WHERE BEATMAP_ID = ? 
+                ORDER BY PICK_DATE DESC 
+                LIMIT ? 
+                OFFSET ?`
+
+            const query2 = `
+                SELECT COUNT(*) AS total_count
+                FROM PICKS 
+                WHERE PICKER_ID = ?
+            `;
+
+            const rows = memClient.prepare(query).all(id, 10, pageNo * 10);
+            const result = [];
             for (const row of rows) {
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
-                let pickCount = memClient.prepare(query3).get(row.PICKER_ID);
+                let pickCount = memClient.prepare(query2).get(row.PICKER_ID);
                 if (!pickCount) {
-                    pickCount = 0;
+                    pickCount = { total_count: 0 };
                 }
-                history.push({ 
+                result.push({ 
                     id: row.PICKER_ID, 
                     n: player.n,
                     con_c: player.con_c,
@@ -224,13 +264,9 @@ async function main(){
                     gr: player.gr,
                     pt: player.pt,
                     pickCount: pickCount.total_count,
-                    pickDate: row.PICK_DATE });
+                    pickDate: row.PICK_DATE 
+                });
             }
-            const result = { 
-                beatmap: meta, 
-                history: history,
-                alltimeCount: countResult.total_count
-            };
             if (!isDeletingCache) {
                 await redisCache.set(cacheKey, JSON.stringify(result));
             }        

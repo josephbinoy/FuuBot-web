@@ -1,7 +1,6 @@
 import CustomNavbar from "../components/CustomNavbar"
 import MapCard from "../components/MapCard";
-import PlayerCard from "../components/PlayerCard";
-import SkeletonPlayerCard from "../skeletons/SkeletonPlayerCard";
+import HistoryTable from "../components/HistoryTable";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate, useLocation} from "react-router-dom";
@@ -10,7 +9,6 @@ import SkeletonMapCard from "../skeletons/SkeletonMapCard";
 import { useAlert } from "../context/AlertProvider";
 
 export default function History() {
-    const [data, setData] = useState([null, null, null, null, null]);
     const { setalertMsg } = useAlert();
     const [map, setMap] = useState({});
     const [totalCount, setTotalCount] = useState(null);
@@ -24,13 +22,7 @@ export default function History() {
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/history/${id}`);
                 setMap(response.data.beatmap);
                 setTotalCount(response.data.alltimeCount);
-                if (response.data.history.length === 0) {
-                    setData(prevData => prevData.filter(d => d !== null));
-                    return;
-                }
-                setData(response.data.history);
             } catch (error) {
-                setData(prevData => prevData.filter(d => d !== null));
                 if(error.response.data.error === "Beatmap not found") {         
                     setalertMsg("This beatmap has never been picked in the lobby!");
                 }
@@ -44,7 +36,7 @@ export default function History() {
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
         <CustomNavbar />
-        <div className="relative bg-cover bg-center pb-48 pt-10" style={{
+        <div className="relative bg-cover bg-center pb-44 pt-10" style={{
             backgroundImage: `url(https://assets.ppy.sh/beatmaps/${id}/covers/cover.jpg)`
         }}>
         <div className="absolute inset-0" style={{
@@ -79,37 +71,11 @@ export default function History() {
                 submittedAt={map.sdate}
             />: <SkeletonMapCard />}
             {totalCount &&
-            <h1 className="absolute bottom-14 w-full text-3xl mx-auto text-gray-300 font-extrabold text-center leading-relaxed">
-                This map has been picked by <span className="text-glow-200 text-4xl opacity-70">{data.length}</span>{ ` player${data.length == 1 ? '' : 's'}` }<br />this week
-                and <span className="text-glow-200 text-4xl opacity-70">{totalCount}</span>{ ` player${totalCount == 1 ? '' : 's'}`} all time
+            <h1 className="absolute bottom-18 w-full text-3xl mx-auto text-gray-300 font-extrabold text-center leading-relaxed">
+                This map has been picked by <span className="text-glow-200 text-4xl opacity-70">{totalCount}</span>{ ` player${totalCount == 1 ? '' : 's'}`} all time!
             </h1>}
         </div>
-        <div className="flex flex-col gap-3 mx-auto max-w-screen-lg px-10 pb-10">
-            {data.length>0 && <p className="text-osuslate-100 font-bold pl-12">This week</p>}
-            {data.map((row, index) => 
-                row ? <div className="flex items-center justify-between gap-1" key={index}>
-                <p className="text-2xl text-gray-300 w-10 text-center">{index+1}</p>
-                <div className="flex-grow">
-                    <PlayerCard 
-                        id={row.id} 
-                        name={row.n} 
-                        country={row.con_c}
-                        rank={row.gr}
-                        playTime={row.pt}
-                        pickCount={row.pickCount}
-                        pickDate={row.pickDate} 
-                        coverUrl={row.cv} 
-                    />
-                </div></div>:
-                <div className="flex items-center justify-between gap-1" key={index}>
-                    <p className="text-2xl text-gray-300 min-w-10 text-center" />
-                    <div className="flex-grow">
-                        <SkeletonPlayerCard />
-                    </div>
-                </div>
-                
-            )}
-        </div>
+        <HistoryTable id={id} />
     </div>
   );
 }
