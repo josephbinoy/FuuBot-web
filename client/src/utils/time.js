@@ -29,7 +29,7 @@ export function timeAgo(timestamp) {
 export function getDateString(timestamp) {
     const date = new Date(timestamp * 1000);
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString('en-GB', options);
 }
 
 export function timeAgoLarge(timestamp) {
