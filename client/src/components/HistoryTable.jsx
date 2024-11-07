@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDbv } from "../context/DbvProvider";
 import { useEffect, useState, useRef } from 'react';
 import { useAlert } from "../context/AlertProvider";
-import { timeAgoLarge } from "../utils/time";
+import { timeAgo, getDateString, timeAgoLarge } from "../utils/time";
 
 export default function HistoryTable( { id }) {
     const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
@@ -96,8 +96,10 @@ export default function HistoryTable( { id }) {
         {rows.map((row, index) => {
                 let showPickDate = false;
                 let currentPickDate = null;
+                let cardDate = '';
                 if (row){
                     currentPickDate = timeAgoLarge(row.pickDate);
+                    cardDate = currentPickDate === 'Past week' ? timeAgo(row.pickDate) : getDateString(row.pickDate);
                     showPickDate = currentPickDate !== previousPickDate;
                     if (previousPickDate === null) {
                         isFirstGroup = true;
@@ -121,7 +123,7 @@ export default function HistoryTable( { id }) {
                     rank={row.gr}
                     playTime={row.pt}
                     pickCount={row.pickCount}
-                    pickDate={row.pickDate} 
+                    pickDate={cardDate} 
                     coverUrl={row.cv} 
                 />
             </div>
