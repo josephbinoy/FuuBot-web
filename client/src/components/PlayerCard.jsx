@@ -1,4 +1,4 @@
-import { daysAgo, convertSecondsToDaysHours } from '../utils/time';
+import { timeAgoSmall, convertSecondsToDaysHours } from '../utils/time';
 import ReactCountryFlag from "react-country-flag"
 import { Link } from 'react-router-dom';
 import { Tooltip } from '@material-tailwind/react';
@@ -30,7 +30,7 @@ export default function PlayerCard({name, id, country, coverUrl, rank, playTime,
                 />
                 <p className='text-xl'>{id==0 ? 'Unknown User' : name}</p><i className='text-base text-gray-400 -ml-2'>{` (${Number(pickCount).toLocaleString()} pick${pickCount == 1 ? '' : 's'})`}</i>
             </div>
-                <p className='text-sm opacity-80 px-2'>{pickDate && `Picked ${daysAgo(pickDate)}`}</p>
+                <p className='text-sm opacity-80 px-2'>{pickDate && `Picked ${timeAgoSmall(pickDate)}`}</p>
             </div>
             </Link>
         </Tooltip>
