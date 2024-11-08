@@ -47,15 +47,11 @@ export function timeAgoLarge(timestamp) {
     const years = Math.floor(days / 365);
 
     if (years > 0) {
-        return `${years+1} years ago`;
+        return `${years} year${years == 1 ? '' : 's'} and older`;
     } else if (months > 0) {
-        if (months === 12)
-            return `1 year ago`;
-        return `${months+1} months ago`;
+        return `${months} month${months == 1 ? '' : 's'} and older`;
     } else if (weeks > 0) {
-        if (weeks === 4)
-            return `1 month ago`;
-        return `${weeks+1} weeks ago`;
+        return `${weeks} week${weeks == 1 ? '' : 's'} and older`;
     } else {
         return `Past week`;
     }
