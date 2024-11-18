@@ -290,7 +290,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
             if (!(await redisClient.exists(`fuubot:beatmap-${beatmapId}`))) {
                 const metadata = await fetchBeatmapsetMetadata(beatmapId, bearerToken);
                 if (!metadata){
-                    redisLogger.error(`Error hydrating beatmap ${beatmapId}. Skipping...`);
+                    redisLogger.error(`Error hydrating beatmap ${beatmapId}`);
                     continue;
                 }
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -592,9 +592,9 @@ export function deleteNotFoundBeatmaps() {
         const deleteStmt = fuuClient.prepare(`DELETE FROM PICKS WHERE BEATMAP_ID IN (${placeholders})`);
         deleteStmt.run(...beatmapDeleteList);
         fuuClient.close();
-        sqliteLogger(`Successfully deleted ${beatmapDeleteList.length} maps`);
+        redisLogger(`Successfully deleted ${beatmapDeleteList.length} maps`);
         beatmapDeleteList.length = 0;
     } catch (error) {
-        sqliteLogger('Error deleting maps:', error);
+        redisLogger('Error deleting maps:', error);
     }
 }
