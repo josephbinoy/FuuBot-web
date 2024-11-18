@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+import { createClient, SchemaFieldTypes } from 'redis';
 import Database from 'better-sqlite3';
 import axios from 'axios';
 import { redisLogger } from './Logger.js';
@@ -498,4 +498,75 @@ export async function refreshPlayerData(redisClient, sqlClient){
     }
     redisLogger.info('100% complete...');
     redisLogger.info('Player data refresh complete');
+}
+
+export async function createBeatmapIndexes(redisClient) {
+    try{
+        await redisClient.ft.create('idx:beatmap', {
+            t: {
+              type: SchemaFieldTypes.TEXT,
+              WEIGHT: 3,
+              WITHSUFFIXTRIE: true
+            //   SORTABLE: true (sorting needs to be added in future to make limit deterministic (not returning duplicates))
+            },
+            a: {
+                type: SchemaFieldTypes.TEXT,
+                NOSTEM: true,
+                WEIGHT: 2,
+                WITHSUFFIXTRIE: true
+            },
+            m: {
+                type: SchemaFieldTypes.TEXT,
+                NOSTEM: true,
+                WEIGHT: 1,
+                WITHSUFFIXTRIE: true
+            }   
+          }, {
+            ON: 'HASH',
+            PREFIX: 'fuubot:beatmap-'
+            // NOHL: true
+          });
+        redisLogger.info('Search indexes created successfully');
+    } catch (error) {
+        if (error.message === 'Index already exists')
+            redisLogger.info('Search Indexes exist already, skipped creation');
+        else
+            redisLogger.error('Errow while creating search indexes', error);
+    }
+}
+
+export async function searchBeatmapIndexes(redisClient, searchTerm, offset) {
+    if (!searchTerm) {
+        return [];
+    }
+    // if (searchField !== 't' && searchField !== 'a' && searchField !== 'm') {
+    //     return [];
+    // }
+
+    let terms = searchTerm.split(' ');
+    terms = terms.map(term => term.length > 2 ? `*${term}*` : term);
+    searchTerm = terms.join(' ');
+    try {
+        // const query = `@${searchField}: ${searchTerm}`;
+        const result = await redisClient.ft.search(
+            'idx:beatmap', 
+            searchTerm,
+            { 
+                LIMIT: 
+                { 
+                    from: offset*10, 
+                    size: 10 
+                },
+                RETURN: ['t', 'a', 'm'],
+                SLOP: 5
+            });
+        if (result.total === 0) {
+            return [];
+        }
+        else
+            return result.documents;
+    } catch (error) {
+        redisLogger.error('Error searching indexes:', error);
+        return [];
+    }
 }

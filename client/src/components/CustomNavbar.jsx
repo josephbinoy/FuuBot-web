@@ -5,10 +5,12 @@ import {
   Typography,
   IconButton
 } from "@material-tailwind/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { NavLink, Link } from "react-router-dom";
+import SearchBar from "./SearchBar";
  
-function NavList() {
+function NavList({ setOpenSearch }) {
   return (
     <ul className="my-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
       <NavLink to={"/"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
@@ -17,16 +19,24 @@ function NavList() {
       <NavLink to={"/players"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
           Players
       </NavLink>
-        <NavLink to={"/about"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
-            About
-        </NavLink>
+      <NavLink to={"/about"} className={({ isActive }) => isActive ? 'text-osuslate-50 lg:scale-105 p-1 font-extrabold font-visby text-2xl' : 'p-1 font-extrabold font-visby text-2xl'} >
+          About
+      </NavLink>
+      <IconButton 
+        ripple={false}
+        size="sm"
+        className="bg-transparent focus:bg-transparent active:bg-transparent shadow-none -ml-1"
+        onClick={() => setOpenSearch(true)}
+        >
+        <MagnifyingGlassIcon className="h-6 w-6 text-osuslate-50 opacity-70" strokeWidth={4} />
+      </IconButton>
     </ul>
   );
 }
  
 export default function CustomNavbar({classes}) {
   const [openNav, setOpenNav] = useState(false);
- 
+  const [openSearch, setOpenSearch] = useState(false);
   const handleWindowResize = () =>
     window.innerWidth >= 960 && setOpenNav(false);
  
@@ -55,7 +65,7 @@ export default function CustomNavbar({classes}) {
           </Typography>
         </div>
         <div className="hidden lg:block">
-          <NavList />
+          <NavList setOpenSearch={setOpenSearch}/>
         </div>
         <IconButton
           variant="text"
@@ -71,8 +81,9 @@ export default function CustomNavbar({classes}) {
         </IconButton>
       </div>
       <Collapse open={openNav}>
-        <NavList />
+        <NavList setOpenSearch={setOpenSearch}/>
       </Collapse>
+      <SearchBar openSearch={openSearch} setOpenSearch={setOpenSearch}/>
     </Navbar>
   );
 }

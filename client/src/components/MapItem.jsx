@@ -27,7 +27,7 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, w
     }
 
     return (
-      <Link to={`history/${mapId}`} state={{ fromApp: true }} className="w-full">
+      <Link to={`/history/${mapId}`} state={{ fromApp: true }} className="w-full">
         <div
           className={`relative flex items-center justify-between h-20 rounded-lg px-6 pr-3 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-gray-100 border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
             <div

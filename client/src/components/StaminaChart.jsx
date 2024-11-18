@@ -2,8 +2,10 @@ import {
     Card,
     CardBody
   } from "@material-tailwind/react";
-  import Chart from "react-apexcharts";
-
+// import Chart from "react-apexcharts";
+import Spinner from "./CustomSpinner";
+import  { Suspense, lazy } from "react";
+  const Chart = lazy(() => import("react-apexcharts"));
   const labels = [
     "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5",
     "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10"
@@ -148,7 +150,9 @@ import {
     return (
       <Card className="w-11/12 mx-auto mt-10">
         <CardBody className="px-7 pb-0 bg-osuslate-900 rounded-lg">
-          <Chart {...chartConfig} />
+          <Suspense fallback={<Spinner />}>
+            <Chart {...chartConfig} />
+          </Suspense>
         </CardBody>
       </Card>
     );

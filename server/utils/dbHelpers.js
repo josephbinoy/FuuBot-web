@@ -201,3 +201,14 @@ export function getBeatmapQuery(period) {
     LIMIT (?) 
     OFFSET (?)`;
 }
+
+export function getSearchBeatmapQuery(){
+    return `
+    SELECT BEATMAP_ID, 
+           COUNT(*) as alltime_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 7 * 86400) THEN 1 ELSE 0 END) as weekly_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
+           SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
+    FROM PICKS
+    WHERE BEATMAP_ID = ?`;
+}

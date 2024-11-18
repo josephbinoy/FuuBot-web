@@ -9,6 +9,7 @@ import { getMemoryClient,
     getStatQuery,
     getSideboardQuery,
     getLeaderboardQuery,
+    getSearchBeatmapQuery,
     getBeatmapQuery } from "./utils/dbHelpers.js";
 import { 
     getRedisCacheClient, 
@@ -18,7 +19,9 @@ import {
     hydrateRedisFromBlacklist, 
     deleteCache, 
     getGuestToken, 
-    refreshPlayerData } from "./utils/redisHelpers.js";
+    refreshPlayerData,
+    createBeatmapIndexes,
+    searchBeatmapIndexes } from "./utils/redisHelpers.js";
 import UpdateQueue from "./utils/UpdateQueue.js";
 import { logger } from "./utils/Logger.js";
 import { addCleanupListener, exitAfterCleanup } from "async-cleanup";
@@ -146,6 +149,7 @@ async function main(){
     } catch (error) {
         logger.error('Error reading blacklist:', error);
     }
+    await createBeatmapIndexes(redisMeta);
     setOtherLimits();
     setWeeklyAndAlltimeLimits();
     cron.schedule('0 0 * * *', () => {
@@ -339,7 +343,11 @@ async function main(){
                 const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);
                 if (meta.t) {
                     let isBlacklisted = blacklist.has(row.BEATMAP_ID);
-                    result.push({ ...row, ...meta, isBlacklisted: isBlacklisted });
+                    result.push({ ...row, 
+                        t: meta.t,
+                        a: meta.a,
+                        m: meta.m,
+                        isBlacklisted: isBlacklisted });
                 }
             }
             if (!isDeletingCache) {
@@ -591,6 +599,50 @@ async function main(){
         }
     });
 
+    app.get('/api/search/:term/:page', async (req, res) => {
+        const term = req.params.term;
+        const page = parseInt(req.params.page);
+        if (!term) {
+            res.status(400).json({ error: 'Query parameter is required' });
+            return;
+        }
+        const cacheKey = `fuubot:cache-search-${term}-${page}`;
+        try {
+            if (!isDeletingCache) {
+                const cachedResult = await redisCache.get(cacheKey);
+                if (cachedResult) {
+                    res.json(JSON.parse(cachedResult));
+                    return;
+                }
+            }
+            const query = getSearchBeatmapQuery();
+            const maps = await searchBeatmapIndexes(redisMeta, term, page);
+            const result = [];
+            for (const map of maps) {
+                const parts = map.id.split('-');
+                const beatmapId = parts[1];
+                const counts = memClient.prepare(query).get(beatmapId);
+                result.push({ 
+                    BEATMAP_ID: beatmapId,
+                    t: map.value.t,
+                    a: map.value.a,
+                    m: map.value.m,
+                    alltime_count: counts.alltime_count,
+                    weekly_count: counts.weekly_count,
+                    monthly_count: counts.monthly_count,
+                    yearly_count: counts.yearly_count
+                 });
+            }
+            if (!isDeletingCache) {
+                await redisCache.set(cacheKey, JSON.stringify(result));
+            }   
+            res.json(result);
+        } catch (error) {
+            console.error('Error searching titles:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+    
     app.listen(process.env.PORT, () => {
         logger.info(`Server running on port ${process.env.PORT}!`);
     });
