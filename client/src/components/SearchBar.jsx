@@ -36,8 +36,7 @@ export default function SearchBar({ openSearch, setOpenSearch }) {
 
   const fetchSearchResults = async (term) => {
     if (term) {
-      try {
-        console.log('Fetching search results for:', term);      
+      try {    
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/search/${term}/0`);
         setSearchResults(response.data);
         if (response.data.length === 0) {
