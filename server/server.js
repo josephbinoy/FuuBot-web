@@ -617,7 +617,7 @@ async function main(){
             }
             const maps = await searchBeatmapIndexes(redisMeta, term, page);
             const beatmapIds = maps.map(map => map.id.split('-')[1]);
-            const query = getSearchBeatmapQuery(beatmapIds.length); //optimizz
+            const query = getSearchBeatmapQuery(beatmapIds);
             const counts = memClient.prepare(query).all(beatmapIds);
             const countsMap = Object.fromEntries(counts.map(count => [count.BEATMAP_ID, count]));
 
