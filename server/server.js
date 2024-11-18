@@ -615,24 +615,32 @@ async function main(){
                     return;
                 }
             }
-            const query = getSearchBeatmapQuery();
             const maps = await searchBeatmapIndexes(redisMeta, term, page);
-            const result = [];
-            for (const map of maps) {
-                const parts = map.id.split('-');
-                const beatmapId = parts[1];
-                const counts = memClient.prepare(query).get(beatmapId);
-                result.push({ 
+            const beatmapIds = maps.map(map => map.id.split('-')[1]);
+            const query = getSearchBeatmapQuery(beatmapIds.length); //optimizz
+            const counts = memClient.prepare(query).all(beatmapIds);
+            const countsMap = Object.fromEntries(counts.map(count => [count.BEATMAP_ID, count]));
+
+            const result = maps.map((map, index) => {
+                const beatmapId = beatmapIds[index];
+                const countData = countsMap[beatmapId] || {
+                    alltime_count: 0,
+                    weekly_count: 0,
+                    monthly_count: 0,
+                    yearly_count: 0,
+                };
+                return { 
                     BEATMAP_ID: beatmapId,
                     t: map.value.t,
                     a: map.value.a,
                     m: map.value.m,
-                    alltime_count: counts.alltime_count,
-                    weekly_count: counts.weekly_count,
-                    monthly_count: counts.monthly_count,
-                    yearly_count: counts.yearly_count
-                 });
-            }
+                    alltime_count: countData.alltime_count,
+                    weekly_count: countData.weekly_count,
+                    monthly_count: countData.monthly_count,
+                    yearly_count: countData.yearly_count,
+                };
+            });
+
             if (!isDeletingCache) {
                 await redisCache.set(cacheKey, JSON.stringify(result));
             }   

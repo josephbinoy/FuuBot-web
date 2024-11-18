@@ -509,8 +509,8 @@ export async function refreshPlayerData(redisClient, sqlClient){
 
 export async function createBeatmapIndexes(redisClient) {
     try{
-        await redisClient.ft.dropIndex('fuubot:idx-beatmap');
-        redisLogger.info('Dropped old indexes');
+        // await redisClient.ft.dropIndex('fuubot:idx-beatmap');
+        // redisLogger.info('Dropped old indexes');
         await redisClient.ft.create('fuubot:idx-beatmap', {
             t: {
               type: SchemaFieldTypes.TEXT,

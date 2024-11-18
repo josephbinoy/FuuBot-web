@@ -202,7 +202,8 @@ export function getBeatmapQuery(period) {
     OFFSET (?)`;
 }
 
-export function getSearchBeatmapQuery(){
+export function getSearchBeatmapQuery(ids) {
+    const placeholders = ids.map(() => '?').join(', ');
     return `
     SELECT BEATMAP_ID, 
            COUNT(*) as alltime_count,
@@ -210,5 +211,6 @@ export function getSearchBeatmapQuery(){
            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 30 * 86400) THEN 1 ELSE 0 END) as monthly_count,
            SUM(CASE WHEN PICK_DATE > (strftime('%s', 'now') - 365 * 86400) THEN 1 ELSE 0 END) as yearly_count
     FROM PICKS
-    WHERE BEATMAP_ID = ?`;
+    WHERE BEATMAP_ID IN (${placeholders})
+    GROUP BY BEATMAP_ID`;
 }
