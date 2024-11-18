@@ -3,6 +3,8 @@ import Database from 'better-sqlite3';
 import axios from 'axios';
 import { redisLogger } from './Logger.js';
 
+const beatmapDeleteList = [];
+
 export async function getRedisCacheClient() {
     const client = createClient({
         url: process.env.REDIS_CACHE_URL
@@ -124,7 +126,10 @@ export async function fetchBeatmapsetMetadata(beatmapsetId, bearerToken) {
          redisLogger.error(`Error: Received status code ${response.status}`);
       }
       } catch (error) {
-         redisLogger.error(`Error while fetching beatmap metadata: ${error.message}`);
+         if (error.response && error.response.status === 404) {
+            redisLogger.error(`Error: Beatmapset ${beatmapsetId} does not exist. Queueing for deletion...`);
+            beatmapDeleteList.push(beatmapsetId);
+         }
       }
 }
 
@@ -160,6 +165,7 @@ export async function hydrateRedis(redisClient, bearerToken, rows){
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
         }
     }
+    deleteNotFoundBeatmaps();
     redisLogger.info('Hydrating Redis with player data from new rows...');
     const playerBuffer = [];
     const apiLimit = 30;
@@ -255,6 +261,7 @@ export async function hydrateRedisFromBlacklist(redisClient, bearerToken, blackl
             redisLogger.error(`Error hydrating beatmap ${beatmapId}: ${error.message}`);
         }
     }
+    deleteNotFoundBeatmaps();
 }
 
 export async function hydrateRedisFromBackup(redisClient, bearerToken){
@@ -306,7 +313,7 @@ export async function hydrateRedisFromBackup(redisClient, bearerToken){
         }
     }
     redisLogger.info('100% complete...');
-
+    deleteNotFoundBeatmaps();
     try {
         rows = db.prepare('SELECT DISTINCT PICKER_ID FROM PICKS;').all();
         redisLogger.info(`Found ${rows.length} unique players`);
@@ -568,5 +575,24 @@ export async function searchBeatmapIndexes(redisClient, searchTerm, offset) {
     } catch (error) {
         redisLogger.error('Error searching indexes:', error);
         return [];
+    }
+}
+
+export function deleteNotFoundBeatmaps() {
+    if (beatmapDeleteList.length === 0) {
+        return;
+    }
+    try {
+        const fuuClient = new Database(process.env.FUUBOT_DB_PATH, { 
+            fileMustExist: true
+        });
+        const placeholders = beatmapDeleteList.map(() => '?').join(',');
+        const deleteStmt = fuuClient.prepare(`DELETE FROM PICKS WHERE BEATMAP_ID IN (${placeholders})`);
+        deleteStmt.run(...beatmapDeleteList);
+        fuuClient.close();
+        sqliteLogger(`Successfully deleted ${beatmapDeleteList.length} maps`);
+        beatmapDeleteList.length = 0;
+    } catch (error) {
+        sqliteLogger('Error deleting maps:', error);
     }
 }
