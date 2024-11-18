@@ -509,10 +509,12 @@ export async function refreshPlayerData(redisClient, sqlClient){
 
 export async function createBeatmapIndexes(redisClient) {
     try{
+        await redisClient.ft.dropIndex('fuubot:idx-beatmap');
+        redisLogger.info('Dropped old indexes');
         await redisClient.ft.create('fuubot:idx-beatmap', {
             t: {
               type: SchemaFieldTypes.TEXT,
-              WEIGHT: 3,
+              WEIGHT: 4,
               WITHSUFFIXTRIE: true
             //   SORTABLE: true (sorting needs to be added in future to make limit deterministic (not returning duplicates))
             },
