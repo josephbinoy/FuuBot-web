@@ -502,7 +502,7 @@ export async function refreshPlayerData(redisClient, sqlClient){
 
 export async function createBeatmapIndexes(redisClient) {
     try{
-        await redisClient.ft.create('idx:beatmap', {
+        await redisClient.ft.create('fuubot:idx-beatmap', {
             t: {
               type: SchemaFieldTypes.TEXT,
               WEIGHT: 3,
@@ -549,7 +549,7 @@ export async function searchBeatmapIndexes(redisClient, searchTerm, offset) {
     try {
         // const query = `@${searchField}: ${searchTerm}`;
         const result = await redisClient.ft.search(
-            'idx:beatmap', 
+            'fuubot:idx-beatmap', 
             searchTerm,
             { 
                 LIMIT: 
