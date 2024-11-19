@@ -121,9 +121,9 @@ export default function SearchBar({ openSearch, setOpenSearch }) {
           )}
           </IconButton>
         </DialogHeader>
-        <DialogBody id="scrollableDiv" className="max-h-[600px] scrollbar scrollbar-thumb-osuslate-200 overflow-y-auto">
+        <DialogBody id="scrollableDiv" className="max-h-[60vh] scrollbar scrollbar-thumb-osuslate-200 overflow-y-auto">
           <InfiniteScroll
-            className="flex flex-col gap-4 px-10"
+            className="flex flex-col gap-4 px-10 pt-2"
             dataLength={searchResults.length}
             next={fetchData}
             loader={<>

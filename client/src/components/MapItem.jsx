@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTable } from '../context/TableProvider.jsx';
+import { useEffect, useState } from 'react';
 
 export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, weeklyCount=0, monthlyCount=0, yearlyCount=0, alltimeCount=0}) {
   const { pickLimits } = useTable();
@@ -26,18 +27,27 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, w
       }
     }
 
+    const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+
+    useEffect(() => {
+      const img = new Image();
+      img.src = `https://assets.ppy.sh/beatmaps/${mapId}/covers/slimcover.jpg`;
+      img.onload = () => setBackgroundLoaded(true);
+    }, []);
+
     return (
       <Link to={`/history/${mapId}`} state={{ fromApp: true }} className="w-full">
         <div
           className={`relative flex items-center justify-between h-20 rounded-lg px-6 pr-3 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-gray-100 border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
             <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-105"
-                style={{
-                    backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.8) 100%), url(https://assets.ppy.sh/beatmaps/${mapId}/covers/slimcover.jpg)`,
-                }}
+              className={`absolute inset-0 ${backgroundLoaded ? 'bg-cover bg-center transition-transform duration-500 hover:scale-105' : 'animate-pulse-fast bg-osuslate-100'}`}
+              style={{
+                backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.7) 20%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.8) 100%)${
+                              backgroundLoaded ? `, url(https://assets.ppy.sh/beatmaps/${mapId}/covers/slimcover.jpg)` : ''}`
+              }}
             />
-            <div className="w-6/12 flex flex-col gap-1 z-10 pointer-events-none">
-              <h2 className="truncate max-w-[500px]">{mapName}</h2>
+            <div className="w-8/12 flex flex-col gap-1 z-10 pointer-events-none">
+              <h2 className="truncate max-w-[600px] xl:max-w-[750px] w-full">{mapName}</h2>
               <div className="text-xs flex items-center w-full">
                 <p className="truncate">{mapArtist} •<span className="text-gray-500"> Mapped by {mapper}</span></p>
               </div>
