@@ -109,7 +109,7 @@ export function getSideboardQuery(type, weekly, monthly, yearly, alltime) {
         AND PICKER_ID != 0
         GROUP BY PICKER_ID
         ORDER BY PICK_COUNT DESC
-        LIMIT 10;`
+        LIMIT 15;`
     }
     else{
         return `
@@ -153,7 +153,7 @@ export function getSideboardQuery(type, weekly, monthly, yearly, alltime) {
         WHERE PICKER_ID != 0
         GROUP BY PICKER_ID
         ORDER BY PICK_COUNT DESC
-        LIMIT 10;`
+        LIMIT 15;`
     }
 }
 

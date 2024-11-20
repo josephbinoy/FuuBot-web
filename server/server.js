@@ -490,7 +490,8 @@ async function main(){
             }
             const rows = memClient.prepare(query).all();
             const result = [];
-            for (const row of rows) {
+            for (let i = 0; i < rows.length && result.length < 10; i++) {
+                const row = rows[i];
                 const player = await redisMeta.hGetAll(`fuubot:player-${row.PICKER_ID}`);
                 if (player.n) {
                     result.push({
