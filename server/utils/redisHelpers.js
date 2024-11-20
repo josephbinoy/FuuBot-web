@@ -4,6 +4,7 @@ import axios from 'axios';
 import { redisLogger } from './Logger.js';
 
 const beatmapDeleteList = [];
+const playerDeleteList = [];
 
 export async function getRedisCacheClient() {
     const client = createClient({
@@ -77,16 +78,16 @@ async function fetchPlayerData(playerIds, bearerToken) {
                 for (let i = 0; i < players.users.length; i++) {
                     result.push({
                         id: players.users[i].id,
-                        n: players.users[i].username,
-                        cv: players.users[i].cover.url,
-                        con_c: players.users[i].country.code,
-                        con_n: players.users[i].country.name,
-                        sp: players.users[i].is_supporter,
-                        gr: players.users[i].statistics_rulesets.osu.global_rank,
-                        pp: players.users[i].statistics_rulesets.osu.pp,
-                        acc: players.users[i].statistics_rulesets.osu.hit_accuracy,
-                        pc: players.users[i].statistics_rulesets.osu.play_count,
-                        pt: players.users[i].statistics_rulesets.osu.play_time,
+                        n: players.users[i].username || 'Unknown',
+                        cv: players.users[i].cover.url || '',
+                        con_c: players.users[i].country.code || '',
+                        con_n: players.users[i].country.name || '',
+                        sp: players.users[i].is_supporter || false,
+                        gr: players.users[i].statistics_rulesets.osu.global_rank || 0,
+                        pp: players.users[i].statistics_rulesets.osu.pp || 0,
+                        acc: players.users[i].statistics_rulesets.osu.hit_accuracy || 0,
+                        pc: players.users[i].statistics_rulesets.osu.play_count || 0,
+                        pt: players.users[i].statistics_rulesets.osu.play_time || 0,
                     });
                 }
             }
@@ -567,7 +568,8 @@ export async function searchBeatmapIndexes(redisClient, searchTerm, offset) {
                     size: 10 
                 },
                 RETURN: ['t', 'a', 'm'],
-                SLOP: 5
+                SLOP: 5,
+                SCORER: 'BM25'
             });
         if (result.total === 0) {
             return [];
@@ -596,5 +598,24 @@ export function deleteNotFoundBeatmaps() {
         beatmapDeleteList.length = 0;
     } catch (error) {
         redisLogger('Error deleting maps:', error);
+    }
+}
+
+export function deleteNotFoundPlayers() {
+    if (playerDeleteList.length === 0) {
+        return;
+    }
+    try {
+        const fuuClient = new Database(process.env.FUUBOT_DB_PATH, { 
+            fileMustExist: true
+        });
+        const placeholders = playerDeleteList.map(() => '?').join(',');
+        const deleteStmt = fuuClient.prepare(`DELETE FROM PICKS WHERE PICKER_ID IN (${placeholders})`);
+        deleteStmt.run(...playerDeleteList);
+        fuuClient.close();
+        redisLogger(`Successfully deleted ${playerDeleteList.length} players`);
+        playerDeleteList.length = 0;
+    } catch (error) {
+        redisLogger('Error deleting players:', error);
     }
 }
