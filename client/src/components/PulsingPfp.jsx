@@ -12,8 +12,7 @@ export default function PulsingPfp({ imageUrl }) {
   return (
     <img
       src={imageLoaded ? imageUrl : ''}
-      alt="pfp"
-      className={imageLoaded?'w-10 h-10 rounded-reg':'w-10 h-10 rounded-md bg-gray-300 animate-pulse'}
+      className={imageLoaded?'w-10 h-10 rounded-reg':'w-10 h-10 rounded-reg bg-osuslate-100 animate-pulse'}
     />
   );
 }

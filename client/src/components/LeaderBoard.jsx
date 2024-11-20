@@ -9,6 +9,7 @@ import CaretUpIcon from "./CaretUpIcon";
 import { getYesterdayDate } from "../utils/time";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import PulsingPfp from "./PulsingPfp";
   
 export default function LeaderBoard({period, currentLeaderboard, setcurrentLeaderboard}) {
   const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
@@ -108,7 +109,7 @@ export default function LeaderBoard({period, currentLeaderboard, setcurrentLeade
                     </td>
                     <td className='p-4'>
                       <Link className="flex gap-3 items-center justify-start" to={`/profile/${row.id}`} state={{ fromApp: true }}>
-                        <img src={`https://a.ppy.sh/${row.id}`} alt="pfp" className="w-10 h-10 rounded-reg" />
+                        <PulsingPfp imageUrl={`https://a.ppy.sh/${row.id}`} />
                         <ReactCountryFlag
                             countryCode={row.country}
                             svg
