@@ -568,8 +568,8 @@ export async function searchBeatmapIndexes(redisClient, searchTerm, offset) {
                     size: 10 
                 },
                 RETURN: ['t', 'a', 'm'],
-                SLOP: 5,
-                SCORER: 'BM25'
+                SLOP: 5
+                // SCORER: 'BM25'
             });
         if (result.total === 0) {
             return [];

@@ -10,9 +10,10 @@ export default function PulsingPfp({ imageUrl }) {
   }, []);
 
   return (
-    <img
-      src={imageLoaded ? imageUrl : ''}
-      className={imageLoaded?'w-10 h-10 rounded-reg':'w-10 h-10 rounded-reg bg-osuslate-100 animate-pulse'}
-    />
+    imageLoaded ? (
+      <img src={imageUrl} className="w-10 h-10 rounded-reg" />
+    ) : (
+      <div className="w-10 h-10 rounded-reg bg-osuslate-100 animate-pulse" />
+    )
   );
 }
