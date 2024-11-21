@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTable } from '../context/TableProvider.jsx';
 import { useEffect, useState } from 'react';
 
@@ -35,8 +35,10 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, w
       img.onload = () => setBackgroundLoaded(true);
     }, []);
 
+    const { pathname } = useLocation();
+
     return (
-      <Link to={`/history/${mapId}`} state={{ fromApp: true }} className="w-full">
+      <Link to={`/history/${mapId}`} state={{ fromApp: true }} className="w-full" reloadDocument={pathname.startsWith("/history")}>
         <div
           className={`relative flex items-center justify-between h-20 rounded-lg px-6 pr-3 font-visby font-bold text-2xl text-opacity-80 shadow-lg text-gray-100 border-r-4 ${borderColorClass} hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300 hover:opacity-80 overflow-hidden`}>
             <div
@@ -53,10 +55,10 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, w
               </div>
             </div>
             <div className='flex items-center justify-center divide-x-1 divide-gray-300 divide-opacity-30'>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(weeklyCount, weeklyLimit)} ${tableType==='weekly'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='weekly'?'':'opacity-70'}`}>W</span>{weeklyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(monthlyCount, monthlyLimit)} ${tableType==='monthly'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='monthly'?'':'opacity-70'}`}>M</span>{monthlyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(yearlyCount, yearlyLimit)} ${tableType==='yearly'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='yearly'?'':'opacity-70'}`}>Y</span>{yearlyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(alltimeCount, alltimeLimit)} ${tableType==='alltime'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='alltime'?'':'opacity-70'}`}>A</span>{alltimeCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(weeklyCount, weeklyLimit)} ${tableType==='weekly' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='weekly' || 'none'?'':'opacity-70'}`}>W</span>{weeklyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(monthlyCount, monthlyLimit)} ${tableType==='monthly' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='monthly' || 'none'?'':'opacity-70'}`}>M</span>{monthlyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(yearlyCount, yearlyLimit)} ${tableType==='yearly' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='yearly' || 'none'?'':'opacity-70'}`}>Y</span>{yearlyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(alltimeCount, alltimeLimit)} ${tableType==='alltime' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='alltime' || 'none'?'':'opacity-70'}`}>A</span>{alltimeCount}</p>
             </div>
         </div>
       </Link>
