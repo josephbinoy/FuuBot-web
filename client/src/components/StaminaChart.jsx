@@ -148,9 +148,9 @@ import  { Suspense, lazy } from "react";
    
   export default function StaminaChart() {
     return (
-      <Card className="w-11/12 mx-auto mt-10">
-        <CardBody className="px-7 pb-0 bg-osuslate-900 rounded-lg">
-          <Suspense fallback={<Spinner />}>
+      <Card className="w-11/12 mx-auto mt-10 bg-osuslate-900">
+        <CardBody className="px-7 pb-0 h-[440px]">
+          <Suspense fallback={<div className="flex justify-center items-center mt-[178px]"><Spinner /></div>}>
             <Chart {...chartConfig} />
           </Suspense>
         </CardBody>
