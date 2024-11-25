@@ -55,10 +55,10 @@ export default function MapItem({mapId, mapName, mapArtist, mapper, tableType, w
               </div>
             </div>
             <div className='flex items-center justify-center divide-x-1 divide-gray-300 divide-opacity-30'>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(weeklyCount, weeklyLimit)} ${tableType==='weekly' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='weekly' || 'none'?'':'opacity-70'}`}>W</span>{weeklyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(monthlyCount, monthlyLimit)} ${tableType==='monthly' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='monthly' || 'none'?'':'opacity-70'}`}>M</span>{monthlyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(yearlyCount, yearlyLimit)} ${tableType==='yearly' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='yearly' || 'none'?'':'opacity-70'}`}>Y</span>{yearlyCount}</p>
-              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(alltimeCount, alltimeLimit)} ${tableType==='alltime' || 'none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300 ${tableType==='alltime' || 'none'?'':'opacity-70'}`}>A</span>{alltimeCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(weeklyCount, weeklyLimit)} ${tableType==='weekly' || tableType==='none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300`}>W</span>{weeklyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(monthlyCount, monthlyLimit)} ${tableType==='monthly' || tableType==='none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300`}>M</span>{monthlyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(yearlyCount, yearlyLimit)} ${tableType==='yearly' || tableType==='none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300`}>Y</span>{yearlyCount}</p>
+              <p className={`relative z-10 pointer-events-none w-12 h-10 flex items-end justify-center ${getPickCountColor(alltimeCount, alltimeLimit)} ${tableType==='alltime' || tableType==='none'?'':'opacity-60'}`}><span className={`text-2xs absolute -top-1 text-gray-300`}>A</span>{alltimeCount}</p>
             </div>
         </div>
       </Link>
