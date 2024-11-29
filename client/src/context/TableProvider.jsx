@@ -11,6 +11,7 @@ export const TableProvider = ({ children }) => {
     yearlyLimit: 0,
     alltimeLimit: 0
   });
+  const [renderedTables, setRenderedTables] = useState({ weekly: false, monthly: false, yearly: false, alltime: false });
   useEffect(() => {
     const fetchData = async () => {
         try {
@@ -25,7 +26,7 @@ export const TableProvider = ({ children }) => {
 }, []);
 
   return (
-    <TableContext.Provider value={{ currentTable, setcurrentTable, pickLimits }}>
+    <TableContext.Provider value={{ currentTable, setcurrentTable, pickLimits, renderedTables, setRenderedTables }}>
       {children}
     </TableContext.Provider>
   );

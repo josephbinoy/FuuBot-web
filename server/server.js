@@ -311,8 +311,9 @@ async function main(){
     app.get('/api/beatmaps/:period', async (req, res) => {
         const { period } = req.params;
         const pageNo = parseInt(req.query.pageNo);
+        const pageSize = parseInt(req.query.pageSize);
         const dbv = parseInt(req.query.dbv);
-        if (isNaN(dbv) || isNaN(pageNo) || pageNo < 0) {
+        if (isNaN(dbv) || isNaN(pageNo) || isNaN(pageSize) || pageNo < 0 || pageSize <= 0) {
             res.status(400).json({ error: 'Invalid parameters' });
             return;
         }
@@ -337,7 +338,7 @@ async function main(){
             if (!query) {
                 return;
             }
-            const rows = memClient.prepare(query).all(10, pageNo * 10);
+            const rows = memClient.prepare(query).all(pageSize, pageNo * pageSize);
             const result = [];
             for (const row of rows) {
                 const meta = await redisMeta.hGetAll(`fuubot:beatmap-${row.BEATMAP_ID}`);

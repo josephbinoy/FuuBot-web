@@ -3,11 +3,11 @@ import BlackItem from "./BlackItem";
 import SkeletonItem from "../skeletons/SkeletonItem";
 import axios from 'axios';
 import { useDbv } from "../context/DbvProvider";
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { useAlert } from "../context/AlertProvider";
 
-export default function MapTable( { tableType }) {
-    const [rows, setRows] = useState([null, null, null, null, null, null, null, null, null, null]);
+const MapTable = ({ tableType, pageSize }) => {
+    const [rows, setRows] = useState(Array(pageSize).fill(null));
     const [pageNo, setPageNo] = useState(0);
     const { setalertMsg } = useAlert();
     const [dataEnd, setDataEnd] = useState(false);
@@ -17,7 +17,7 @@ export default function MapTable( { tableType }) {
         const fetchData = async () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/beatmaps/${tableType}`, {
-                    params: { pageNo, dbv: dbv }
+                    params: { pageNo, pageSize, dbv }
                 });
                 const newRows = response.data;
                 if (newRows.length === 0) {
@@ -69,7 +69,7 @@ export default function MapTable( { tableType }) {
 
         observer.current = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
-                setRows(prevRows => [...prevRows, null, null, null, null, null, null, null, null, null, null]);
+                setRows(prevRows => [...prevRows, ...Array(pageSize).fill(null)]);
                 setPageNo(prevPageNo => prevPageNo + 1);
             }
         }, options);
@@ -118,4 +118,6 @@ export default function MapTable( { tableType }) {
             {dataEnd && <p className="mx-auto text-osuslate-100 font-visby font-bold text-xl mb-4">End of Data</p>}
         </div>
     );
-}
+};
+
+export default memo(MapTable);

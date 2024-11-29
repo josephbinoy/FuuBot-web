@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { Tooltip } from "@material-tailwind/react";
 
 export default function Jumbo() {
-    const { currentTable, setcurrentTable } = useTable();
+    const { currentTable, setcurrentTable, renderedTables ,setRenderedTables } = useTable();
     const [pickCounts, setPickCounts] = useState({
         weekly_count: 0,
         monthly_count: 0,
@@ -28,6 +28,14 @@ export default function Jumbo() {
 
         fetchData();
     }, []);
+
+    const handleTableSwitch = (tableType) => {
+        if (!renderedTables[tableType]) {
+            setRenderedTables(prev => ({ ...prev, [tableType]: true }));
+        }
+        setcurrentTable(tableType);
+      };
+
     return (
         <div className=" relative mx-auto max-w-screen-xl flex items-center justify-between h-40">
             <div className="flex items-end justify-center px-12 gap-2">
@@ -35,22 +43,22 @@ export default function Jumbo() {
                 <BeatmapTip/>
             </div>
             <ButtonGroup fullWidth ripple={false} size="lg" color="blue-gray">
-                <Button onClick={() => setcurrentTable('weekly')}>
+                <Button onClick={() => handleTableSwitch('weekly')}>
                     <Tooltip placement="top" content={<p>Weekly Pick Count: {Number(pickCounts.weekly_count).toLocaleString()}</p>}>
                         <p className={`${currentTable === 'weekly' && 'text-gray-300 -translate-y-px'}`}>weekly</p>
                     </Tooltip>
                 </Button>
-                <Button onClick={() => setcurrentTable('monthly')}>
+                <Button onClick={() => handleTableSwitch('monthly')}>
                     <Tooltip placement="top" content={<p>Monthly Pick Count: {Number(pickCounts.monthly_count).toLocaleString()}</p>}>
                         <p className={`${currentTable === 'monthly' && 'text-gray-300 -translate-y-px'}`}>monthly</p>
                     </Tooltip>
                 </Button>
-                <Button onClick={() => setcurrentTable('yearly')}>
+                <Button onClick={() => handleTableSwitch('yearly')}>
                     <Tooltip placement="top" content={<p>Yearly Pick Count: {Number(pickCounts.yearly_count).toLocaleString()}</p>}>   
                         <p className={`${currentTable === 'yearly' && 'text-gray-300 -translate-y-px'}`}>yearly</p>
                     </Tooltip>
                 </Button>
-                <Button onClick={() => setcurrentTable('alltime')}>
+                <Button onClick={() => handleTableSwitch('alltime')}>
                     <Tooltip placement="top" content={<p>All-time Pick Count: {Number(pickCounts.alltime_count).toLocaleString()}</p>}>
                         <p className={`${currentTable === 'alltime' && 'text-gray-300 -translate-y-px'}`}>alltime</p>
                     </Tooltip>
