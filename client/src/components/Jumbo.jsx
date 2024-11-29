@@ -7,8 +7,8 @@ import axios from 'axios';
 import { useEffect, useState } from "react";
 import { Tooltip } from "@material-tailwind/react";
 
-export default function Jumbo() {
-    const { currentTable, setcurrentTable, renderedTables ,setRenderedTables } = useTable();
+export default function Jumbo( { renderedTables, setRenderedTables } ) {
+    const { currentTable, setcurrentTable } = useTable();
     const [pickCounts, setPickCounts] = useState({
         weekly_count: 0,
         monthly_count: 0,

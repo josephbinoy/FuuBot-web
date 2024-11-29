@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTable } from "../context/TableProvider";
 import CustomNavbar from "../components/CustomNavbar"
@@ -6,8 +6,14 @@ import Jumbo from "../components/Jumbo"
 import MapTable from "../components/MapTable"
 
 export default function Beatmaps() {
-  const { currentTable, setcurrentTable, renderedTables, setRenderedTables } = useTable();
+  const { currentTable, setcurrentTable } = useTable();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [renderedTables, setRenderedTables] = useState({ 
+    weekly: false, 
+    monthly: false, 
+    yearly: false, 
+    alltime: false 
+  });
   const pageSize = useRef(Math.ceil(window.innerHeight / 100));
 
   useEffect(() => {
@@ -20,13 +26,13 @@ export default function Beatmaps() {
       setSearchParams({});
     }
     else {
-      setRenderedTables(prev => ({ ...prev, weekly: true }));
+      setRenderedTables(prev => ({ ...prev, [currentTable]: true }));
     }
   }, []);
   return(
     <div className="bg-osuslate-500 min-h-screen scrollbar scrollbar-thumb-osuslate-200 h-32 overflow-y-auto">
       <CustomNavbar />
-      <Jumbo />
+      <Jumbo renderedTables={renderedTables} setRenderedTables={setRenderedTables}/>
       {renderedTables.weekly && (
       <div style={{ display: currentTable === 'weekly' ? 'block' : 'none' }}>
         <MapTable key='weekly' tableType='weekly' pageSize={pageSize.current}/>
